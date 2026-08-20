@@ -1,0 +1,30 @@
+[workspace]
+resolver = "2"
+members = [
+    "app/src-tauri",
+    "deps/libheif-sys",
+    "deps/jpegxl-rs/jpegxl-src",
+    "crates/minifier",
+    "crates/minifier-js",
+    "crates/minifier-utils",
+    "crates/minifier-cli", 
+    "crates/shared",
+    "crates/shared-js",
+]
+
+[profile.release]
+strip = true  # Automatically strip symbols from the binary.
+opt-level = 3
+lto = true
+codegen-units = 1
+
+[profile.release.package.minifier-js]
+opt-level = "s"
+
+[profile.release.package.shared-js]
+# Tell `rustc` to optimize for small code size.
+opt-level = "s"
+
+[patch.crates-io]
+libheif-sys = { path = "./deps/libheif-sys" }
+jpegxl-src = { path = "./deps/jpegxl-rs/jpegxl-src" }

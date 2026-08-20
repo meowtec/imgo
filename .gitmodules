@@ -1,0 +1,26 @@
+[submodule "crates/minifier/libavif-rs"]
+	path = crates/minifier/libavif-rs
+	url = git@github.com:njaard/libavif-rs.git
+[submodule "deps/libheif-sys"]
+	path = deps/libheif-sys
+	url = https://github.com/Cykooz/libheif-sys.git
+	ignore = dirty
+[submodule "deps/kvazaar"]
+	path = deps/kvazaar
+	url = https://github.com/ultravideo/kvazaar.git
+	ignore = dirty
+[submodule "deps/libde265"]
+	path = deps/libde265
+	url = https://github.com/strukturag/libde265.git
+[submodule "deps/libheif"]
+	path = deps/libheif
+	url = https://github.com/strukturag/libheif.git
+[submodule "deps/x265"]
+	path = deps/x265
+	url = https://github.com/videolan/x265.git
+[submodule "deps/libwebp"]
+	path = deps/libwebp
+	url = https://chromium.googlesource.com/webm/libwebp
+[submodule "deps/jpegxl-rs"]
+	path = deps/jpegxl-rs
+	url = https://github.com/inflation/jpegxl-rs.git

@@ -1,0 +1,33 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.trae
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+target
+
+crates/minifier/samples/*/output
+crates/minifier-js/lib
+crates/minifier-js/wasm/minifier-js.js
+crates/minifier-js/wasm/minifier_js.wasm
+app/src/i18n.js
+benchmark/output

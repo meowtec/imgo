@@ -1,0 +1,40 @@
+---
+import Homepage from '../../components/Homepage.astro';
+import { getSiteCopy, localeRoutes } from '../../i18n';
+import Layout from '../../layouts/Layout.astro';
+import '../../styles/global.css';
+
+const locale = 'zh';
+const copy = getSiteCopy(locale);
+const routes = localeRoutes[locale];
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'IMGo',
+    url: 'https://imgo.app/zh/',
+    applicationCategory: 'MultimediaApplication',
+    operatingSystem: '支持现代浏览器的操作系统',
+    isAccessibleForFree: true,
+    inLanguage: copy.htmlLang,
+    featureList: [
+      '批量处理图片',
+      '设备本地图片处理',
+      '网页版使用 WebAssembly',
+      '转换图片格式',
+    ],
+  },
+];
+---
+
+<Layout
+  locale={locale}
+  title={copy.seo.homeTitle}
+  description={copy.seo.homeDescription}
+  pathname={routes.home}
+  alternatePathname={routes.alternateHome}
+  image="/og/imgo-zh.png"
+  {jsonLd}
+>
+  <Homepage {locale} />
+</Layout>

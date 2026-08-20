@@ -1,0 +1,33 @@
+{
+  "name": "@imgo/minifier-js",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "./lib/wrapper.js",
+  "exports": {
+    ".": {
+      "import": "./lib/wrapper.js",
+      "types": "./lib/wrapper.d.ts"
+    }
+  },
+  "scripts": {
+    "test": "vitest",
+    "build": "tsc",
+    "build:wasm": "node ./scripts/build.js",
+    "prepack": "npm run build",
+    "cli": "tsx wrapper-test.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@imgo/shared-js": "workspace:*",
+    "msgpackr": "^2.0.4"
+  },
+  "devDependencies": {
+    "@types/jest-image-snapshot": "^6.4.1",
+    "@types/minimist": "^1.2.5",
+    "jest-image-snapshot": "^6.5.2",
+    "minimist": "^1.2.8",
+    "vitest": "^4.1.10"
+  }
+}

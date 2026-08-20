@@ -1,0 +1,1102 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quality Calibration Charts</title>
+    <style>
+      :root {
+        --BgPage: #0b1020;
+        --BgCard: rgba(15, 23, 42, 0.86);
+        --BgMuted: rgba(148, 163, 184, 0.1);
+        --BorderDefault: rgba(148, 163, 184, 0.22);
+        --TextPrimary: #e5eefc;
+        --TextSecondary: #9fb0ca;
+        --TextMuted: #7d8ca8;
+        --AxisLine: rgba(148, 163, 184, 0.28);
+        --GridLine: rgba(148, 163, 184, 0.14);
+        --ShadowCard: 0 18px 48px rgba(2, 6, 23, 0.35);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+        background:
+          radial-gradient(circle at top, rgba(59, 130, 246, 0.16), transparent 28%),
+          linear-gradient(180deg, #0b1020 0%, #0a0f1d 100%);
+        color: var(--TextPrimary);
+      }
+
+      .page {
+        max-width: 1380px;
+        margin: 0 auto;
+        padding: 32px 24px 48px;
+      }
+
+      .hero {
+        display: grid;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .hero h1 {
+        margin: 0;
+        font-size: 30px;
+        line-height: 1.2;
+      }
+
+      .hero p {
+        margin: 0;
+        color: var(--TextSecondary);
+        max-width: 920px;
+        line-height: 1.6;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .button,
+      .file-picker {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        border-radius: 12px;
+        padding: 0 16px;
+        border: 1px solid var(--BorderDefault);
+        background: var(--BgMuted);
+        color: var(--TextPrimary);
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 14px;
+      }
+
+      .button:hover,
+      .file-picker:hover {
+        border-color: rgba(96, 165, 250, 0.4);
+        background: rgba(96, 165, 250, 0.12);
+      }
+
+      .file-picker input {
+        display: none;
+      }
+
+      .status {
+        color: var(--TextSecondary);
+        font-size: 14px;
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+
+      .source-filter {
+        display: grid;
+        gap: 12px;
+        padding: 16px 18px;
+        margin-bottom: 24px;
+        border: 1px solid var(--BorderDefault);
+        background: var(--BgCard);
+        border-radius: 20px;
+        box-shadow: var(--ShadowCard);
+        backdrop-filter: blur(14px);
+      }
+
+      .source-filter[hidden] {
+        display: none;
+      }
+
+      .source-filter-header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .source-filter-title {
+        display: grid;
+        gap: 4px;
+      }
+
+      .source-filter-title strong {
+        font-size: 15px;
+      }
+
+      .source-filter-title span {
+        color: var(--TextSecondary);
+        font-size: 13px;
+      }
+
+      .source-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .button.small {
+        min-height: 34px;
+        padding: 0 12px;
+        border-radius: 10px;
+        font-size: 13px;
+      }
+
+      .source-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 8px;
+      }
+
+      .source-option {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+        padding: 10px 12px;
+        border: 1px solid var(--BorderDefault);
+        border-radius: 12px;
+        background: rgba(148, 163, 184, 0.08);
+        color: var(--TextSecondary);
+        font-size: 13px;
+        line-height: 1.4;
+        cursor: pointer;
+      }
+
+      .source-option:hover {
+        border-color: rgba(96, 165, 250, 0.4);
+        background: rgba(96, 165, 250, 0.1);
+      }
+
+      .source-option input {
+        margin-top: 2px;
+        accent-color: #60a5fa;
+      }
+
+      .source-option span {
+        overflow-wrap: anywhere;
+      }
+
+      .summary-card,
+      .chart-card {
+        border: 1px solid var(--BorderDefault);
+        background: var(--BgCard);
+        border-radius: 20px;
+        box-shadow: var(--ShadowCard);
+        backdrop-filter: blur(14px);
+      }
+
+      .summary-card {
+        padding: 16px 18px;
+      }
+
+      .summary-card .label {
+        display: block;
+        color: var(--TextMuted);
+        font-size: 13px;
+        margin-bottom: 8px;
+      }
+
+      .summary-card .value {
+        font-size: 26px;
+        font-weight: 700;
+      }
+
+      .summary-card .subvalue {
+        margin-top: 6px;
+        color: var(--TextSecondary);
+        font-size: 13px;
+      }
+
+      .charts {
+        display: grid;
+        gap: 20px;
+      }
+
+      .chart-card {
+        padding: 18px 18px 20px;
+      }
+
+      .chart-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: flex-start;
+        margin-bottom: 12px;
+      }
+
+      .chart-header h2 {
+        margin: 0 0 6px;
+        font-size: 20px;
+      }
+
+      .chart-header p {
+        margin: 0;
+        color: var(--TextSecondary);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .chart-shell {
+        position: relative;
+        width: 100%;
+        height: 440px;
+        padding: 16px;
+        border-radius: 16px;
+        background: rgba(2, 6, 23, 0.35);
+        overflow: hidden;
+      }
+
+      .chart-shell canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .empty-state {
+        padding: 28px;
+        border-radius: 16px;
+        border: 1px dashed var(--BorderDefault);
+        background: rgba(15, 23, 42, 0.4);
+        color: var(--TextSecondary);
+        line-height: 1.6;
+      }
+
+      .footer-note {
+        margin-top: 16px;
+        color: var(--TextMuted);
+        font-size: 13px;
+      }
+
+      @media (max-width: 900px) {
+        .page {
+          padding: 24px 16px 36px;
+        }
+
+        .chart-header {
+          flex-direction: column;
+        }
+
+        .chart-shell {
+          height: 360px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="hero">
+        <h1>Quality Calibration 图表</h1>
+        <p>
+          这个页面展示三张聚合图表：一张看各格式的标称质量与 SSIMULACRA2
+          分数关系，一张看校准后的公共质量与 SSIMULACRA2 分数关系，另一张看产物体积与 SSIMULACRA2
+          分数关系。默认会尝试读取同目录的
+          <code>report.json</code>；如果你直接打开本地 HTML 导致读取失败，可以手动选择文件。
+        </p>
+        <div class="toolbar">
+          <button class="button" id="reload-button" type="button">重新读取 report.json</button>
+          <label class="file-picker">
+            选择 report.json
+            <input id="file-input" type="file" accept=".json,application/json" />
+          </label>
+          <span class="status" id="status-text">正在加载数据...</span>
+        </div>
+      </section>
+
+      <section class="source-filter" id="source-filter" hidden>
+        <div class="source-filter-header">
+          <div class="source-filter-title">
+            <strong>图源</strong>
+            <span id="source-filter-status">默认使用全部图源，多选时按选中图源求平均。</span>
+          </div>
+          <div class="source-actions">
+            <button class="button small" id="select-all-sources" type="button">全选</button>
+            <button class="button small" id="clear-sources" type="button">清空</button>
+          </div>
+        </div>
+        <div class="source-list" id="source-list"></div>
+      </section>
+
+      <section class="summary-grid" id="summary-grid"></section>
+
+      <section class="charts">
+        <article class="chart-card">
+          <div class="chart-header">
+            <div>
+              <h2>标称质量 vs SSIMULACRA2</h2>
+              <p>
+                横轴是编码器对外暴露的 <code>quality</code>，纵轴是同一质量档位下的平均 SSIMULACRA2
+                分数。每条线代表一种输出格式。
+              </p>
+            </div>
+          </div>
+          <div class="chart-shell">
+            <canvas id="quality-chart"></canvas>
+          </div>
+        </article>
+
+        <article class="chart-card">
+          <div class="chart-header">
+            <div>
+              <h2>标称质量（校准后） vs SSIMULACRA2</h2>
+              <p>
+                横轴是跨格式统一后的公共
+                <code>quality</code>，纵轴是按格式专属质量曲线反向映射后的平均 SSIMULACRA2
+                分数。原生编码质量会显示在数据点提示中。
+              </p>
+            </div>
+          </div>
+          <div class="chart-shell">
+            <canvas id="normalized-quality-chart"></canvas>
+          </div>
+        </article>
+
+        <article class="chart-card">
+          <div class="chart-header">
+            <div>
+              <h2>产物体积 vs SSIMULACRA2</h2>
+              <p>
+                横轴是平均 SSIMULACRA2 分数，纵轴是平均产物体积。每条线代表一种输出格式，
+                连接该格式在各标称质量档位上的聚合结果。
+              </p>
+            </div>
+          </div>
+          <div class="chart-shell">
+            <canvas id="size-chart"></canvas>
+          </div>
+        </article>
+      </section>
+
+      <div class="footer-note" id="footer-note"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script type="module">
+      import { normalizeQuality } from './quality-normalize.js';
+
+      const FORMAT_COLORS = {
+        webp: '#60a5fa',
+        heif: '#34d399',
+        avif: '#f59e0b',
+        jxl: '#a78bfa',
+        jpg: '#f87171',
+      };
+
+      const CHART_THEME = {
+        axis: 'rgba(148, 163, 184, 0.34)',
+        grid: 'rgba(148, 163, 184, 0.14)',
+        text: '#9fb0ca',
+      };
+
+      const summaryGrid = document.getElementById('summary-grid');
+      const statusText = document.getElementById('status-text');
+      const footerNote = document.getElementById('footer-note');
+      const reloadButton = document.getElementById('reload-button');
+      const fileInput = document.getElementById('file-input');
+      const sourceFilter = document.getElementById('source-filter');
+      const sourceFilterStatus = document.getElementById('source-filter-status');
+      const sourceList = document.getElementById('source-list');
+      const selectAllSourcesButton = document.getElementById('select-all-sources');
+      const clearSourcesButton = document.getElementById('clear-sources');
+      let currentReport = null;
+      let currentMetadata = null;
+      let selectedSourceKeys = new Set();
+
+      reloadButton.addEventListener('click', () => {
+        loadDefaultReport();
+      });
+
+      fileInput.addEventListener('change', async (event) => {
+        const file = event.target.files?.[0];
+        if (file == null) {
+          return;
+        }
+
+        try {
+          statusText.textContent = `正在读取 ${file.name}...`;
+          const text = await file.text();
+          const report = JSON.parse(text);
+          renderReport(report, { source: `手动载入: ${file.name}` });
+        } catch (error) {
+          showError(`读取文件失败：${error instanceof Error ? error.message : String(error)}`);
+        }
+      });
+
+      selectAllSourcesButton.addEventListener('click', () => {
+        if (currentReport == null) {
+          return;
+        }
+
+        selectedSourceKeys = new Set(
+          (currentReport.images ?? []).map((image, index) => getImageSourceKey(image, index)),
+        );
+        renderSourceFilter(currentReport);
+        renderSelectedReport();
+      });
+
+      clearSourcesButton.addEventListener('click', () => {
+        selectedSourceKeys = new Set();
+        renderSourceFilter(currentReport);
+        renderSelectedReport();
+      });
+
+      sourceList.addEventListener('change', (event) => {
+        const input = event.target;
+        if (input instanceof HTMLInputElement === false || input.type !== 'checkbox') {
+          return;
+        }
+
+        if (input.checked) {
+          selectedSourceKeys.add(input.value);
+        } else {
+          selectedSourceKeys.delete(input.value);
+        }
+
+        renderSourceFilter(currentReport);
+        renderSelectedReport();
+      });
+
+      function formatBytes(bytes) {
+        if (bytes == null || Number.isNaN(bytes)) {
+          return '-';
+        }
+        if (bytes >= 1024 * 1024) {
+          return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+        }
+        if (bytes >= 1024) {
+          return `${(bytes / 1024).toFixed(1)} KB`;
+        }
+        return `${Math.round(bytes)} B`;
+      }
+
+      function roundNumber(value, digits = 2) {
+        return Number(value.toFixed(digits));
+      }
+
+      function average(values) {
+        if (values.length === 0) {
+          return null;
+        }
+        return values.reduce((sum, value) => sum + value, 0) / values.length;
+      }
+
+      function getImageSourceKey(image, index) {
+        return image.source ?? image.referencePath ?? `image-${index}`;
+      }
+
+      function getImageSourceLabel(image, index) {
+        const source = image.source ?? image.referencePath;
+        if (source == null || source === '') {
+          return `图源 ${index + 1}`;
+        }
+        return source.split(/[\\/]/).pop() ?? source;
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#39;');
+      }
+
+      function getSelectedImages(report) {
+        return (report.images ?? []).filter((image, index) =>
+          selectedSourceKeys.has(getImageSourceKey(image, index)),
+        );
+      }
+
+      function renderSourceFilter(report) {
+        if (report == null || Array.isArray(report.images) === false) {
+          sourceFilter.hidden = true;
+          sourceList.innerHTML = '';
+          return;
+        }
+
+        const images = report.images;
+        sourceFilter.hidden = images.length === 0;
+        sourceFilterStatus.textContent = `已选择 ${selectedSourceKeys.size}/${images.length} 个图源；多选时按选中图源求平均。`;
+        sourceList.innerHTML = images
+          .map((image, index) => {
+            const key = getImageSourceKey(image, index);
+            const label = getImageSourceLabel(image, index);
+            return `
+              <label class="source-option">
+                <input type="checkbox" value="${escapeHtml(key)}" ${selectedSourceKeys.has(key) ? 'checked' : ''} />
+                <span>${escapeHtml(label)}</span>
+              </label>
+            `;
+          })
+          .join('');
+      }
+
+      function interpolateScore(points, quality) {
+        if (points.length === 0) {
+          return null;
+        }
+        if (quality <= points[0].quality) {
+          return points[0].avgScore;
+        }
+        if (quality >= points[points.length - 1].quality) {
+          return points[points.length - 1].avgScore;
+        }
+
+        for (let index = 1; index < points.length; index += 1) {
+          const left = points[index - 1];
+          const right = points[index];
+          if (quality <= right.quality) {
+            const factor = (quality - left.quality) / (right.quality - left.quality);
+            return left.avgScore + (right.avgScore - left.avgScore) * factor;
+          }
+        }
+        return points[points.length - 1].avgScore;
+      }
+
+      function buildAggregates(report) {
+        const byFormatQuality = new Map();
+        const formatStats = new Map();
+        let failureCount = 0;
+
+        for (const image of report.images ?? []) {
+          for (const variant of image.variants ?? []) {
+            const format = variant.format;
+            const quality = variant.quality;
+            const key = `${format}::${quality}`;
+
+            if (byFormatQuality.has(key) === false) {
+              byFormatQuality.set(key, {
+                format,
+                quality,
+                scores: [],
+                bytes: [],
+                failures: 0,
+              });
+            }
+
+            if (formatStats.has(format) === false) {
+              formatStats.set(format, {
+                format,
+                scores: [],
+                bytes: [],
+                failures: 0,
+                successes: 0,
+              });
+            }
+
+            const aggregate = byFormatQuality.get(key);
+            const formatAggregate = formatStats.get(format);
+
+            if (variant.score?.value != null && variant.encodedBytes != null) {
+              aggregate.scores.push(variant.score.value);
+              aggregate.bytes.push(variant.encodedBytes);
+              formatAggregate.scores.push(variant.score.value);
+              formatAggregate.bytes.push(variant.encodedBytes);
+              formatAggregate.successes += 1;
+            }
+
+            if (variant.error != null) {
+              aggregate.failures += 1;
+              formatAggregate.failures += 1;
+              failureCount += 1;
+            }
+          }
+        }
+
+        const points = [...byFormatQuality.values()]
+          .map((item) => ({
+            format: item.format,
+            quality: item.quality,
+            avgScore: average(item.scores),
+            avgBytes: average(item.bytes),
+            failures: item.failures,
+          }))
+          .sort(
+            (left, right) =>
+              left.quality - right.quality || left.format.localeCompare(right.format),
+          );
+
+        const lines = [...formatStats.values()]
+          .map((item) => ({
+            format: item.format,
+            avgScore: roundNumber(average(item.scores) ?? 0, 2),
+            avgBytes: Math.round(average(item.bytes) ?? 0),
+            failures: item.failures,
+            successes: item.successes,
+            points: points
+              .filter((point) => point.format === item.format && point.avgScore != null)
+              .map((point) => ({
+                ...point,
+                avgScore: roundNumber(point.avgScore, 2),
+                avgBytes: Math.round(point.avgBytes),
+              })),
+          }))
+          .sort(
+            (left, right) =>
+              report.formats.indexOf(left.format) - report.formats.indexOf(right.format),
+          );
+
+        return { lines, points, failureCount };
+      }
+
+      function renderSummary(report, aggregates, source) {
+        const successfulPoints = aggregates.points.filter((point) => point.avgScore != null);
+        const allScores = successfulPoints.map((point) => point.avgScore);
+        const allBytes = successfulPoints.map((point) => point.avgBytes);
+        const highestScore = allScores.length > 0 ? roundNumber(Math.max(...allScores), 2) : '-';
+        const smallestBytes = allBytes.length > 0 ? formatBytes(Math.min(...allBytes)) : '-';
+
+        const items = [
+          { label: '数据源', value: report.images?.length ?? 0, suffix: '张图', subvalue: source },
+          {
+            label: '格式数',
+            value: report.formats?.length ?? 0,
+            suffix: '种',
+            subvalue: (report.formats ?? []).join(', '),
+          },
+          {
+            label: '质量档位',
+            value: report.qualities?.length ?? 0,
+            suffix: '档',
+            subvalue: (report.qualities ?? []).join(', '),
+          },
+          {
+            label: '最高平均分',
+            value: highestScore,
+            suffix: '',
+            subvalue: '聚合点最大值',
+          },
+          {
+            label: '最小平均体积',
+            value: smallestBytes,
+            suffix: '',
+            subvalue: '聚合点最小值',
+          },
+          {
+            label: '失败项',
+            value: aggregates.failureCount,
+            suffix: '个',
+            subvalue: '已在图表中自动跳过',
+          },
+        ];
+
+        summaryGrid.innerHTML = items
+          .map(
+            (item) => `
+              <div class="summary-card">
+                <span class="label">${item.label}</span>
+                <div class="value">${item.value}${item.suffix}</div>
+                <div class="subvalue">${item.subvalue}</div>
+              </div>
+            `,
+          )
+          .join('');
+      }
+
+      const chartInstances = new Map();
+
+      function getFormatColor(format) {
+        return FORMAT_COLORS[format] ?? '#cbd5e1';
+      }
+
+      function getChartConstructor() {
+        if (window.Chart == null) {
+          throw new Error('Chart.js 加载失败，请检查 CDN 网络访问。');
+        }
+        return window.Chart;
+      }
+
+      function destroyChart(canvasId) {
+        const chart = chartInstances.get(canvasId);
+        if (chart != null) {
+          chart.destroy();
+          chartInstances.delete(canvasId);
+        }
+      }
+
+      function renderEmptyChart(canvasId) {
+        destroyChart(canvasId);
+        const Chart = getChartConstructor();
+        const canvas = document.getElementById(canvasId);
+        const emptyTextPlugin = {
+          id: `${canvasId}-empty-text`,
+          afterDraw(chart) {
+            const { ctx, chartArea } = chart;
+            ctx.save();
+            ctx.fillStyle = CHART_THEME.text;
+            ctx.font = '16px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(
+              '没有可绘制的数据',
+              (chartArea.left + chartArea.right) / 2,
+              (chartArea.top + chartArea.bottom) / 2,
+            );
+            ctx.restore();
+          },
+        };
+
+        chartInstances.set(
+          canvasId,
+          new Chart(canvas, {
+            type: 'line',
+            data: { datasets: [] },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false },
+              },
+              scales: {
+                x: { display: false },
+                y: { display: false },
+              },
+            },
+            plugins: [emptyTextPlugin],
+          }),
+        );
+      }
+
+      function createDataset(format, data) {
+        const color = getFormatColor(format);
+        return {
+          label: format.toUpperCase(),
+          data,
+          parsing: false,
+          borderColor: color,
+          backgroundColor: color,
+          borderWidth: 3,
+          pointRadius: 4.5,
+          pointHoverRadius: 6,
+          pointBorderColor: '#0b1020',
+          pointBorderWidth: 2,
+          tension: 0.25,
+        };
+      }
+
+      function createLineChart(canvasId, datasets, scales, tooltipCallbacks) {
+        destroyChart(canvasId);
+        if (datasets.length === 0) {
+          renderEmptyChart(canvasId);
+          return;
+        }
+
+        const Chart = getChartConstructor();
+        const canvas = document.getElementById(canvasId);
+        chartInstances.set(
+          canvasId,
+          new Chart(canvas, {
+            type: 'line',
+            data: { datasets },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              interaction: {
+                mode: 'nearest',
+                intersect: false,
+              },
+              plugins: {
+                legend: {
+                  position: 'top',
+                  align: 'start',
+                  labels: {
+                    color: CHART_THEME.text,
+                    usePointStyle: true,
+                    boxWidth: 8,
+                    boxHeight: 8,
+                  },
+                },
+                tooltip: {
+                  backgroundColor: 'rgba(9, 14, 28, 0.96)',
+                  borderColor: 'rgba(148, 163, 184, 0.25)',
+                  borderWidth: 1,
+                  titleColor: '#e5eefc',
+                  bodyColor: '#9fb0ca',
+                  displayColors: false,
+                  callbacks: tooltipCallbacks,
+                },
+              },
+              scales,
+            },
+          }),
+        );
+      }
+
+      function createLinearAxis(title, options = {}) {
+        return {
+          type: 'linear',
+          beginAtZero: options.beginAtZero ?? false,
+          min: options.min,
+          max: options.max,
+          suggestedMax: options.suggestedMax,
+          grid: {
+            color: CHART_THEME.grid,
+          },
+          border: {
+            color: CHART_THEME.axis,
+          },
+          ticks: {
+            color: CHART_THEME.text,
+            callback: options.tickCallback,
+          },
+          title: {
+            display: true,
+            text: title,
+            color: CHART_THEME.text,
+          },
+        };
+      }
+
+      function renderQualityChart(lines) {
+        const datasets = lines
+          .filter((line) => line.points.length > 0)
+          .map((line) =>
+            createDataset(
+              line.format,
+              line.points.map((point) => ({
+                x: point.quality,
+                y: point.avgScore,
+                ...point,
+              })),
+            ),
+          );
+
+        createLineChart(
+          'quality-chart',
+          datasets,
+          {
+            x: createLinearAxis('标称质量'),
+            y: createLinearAxis('SSIMULACRA2', {
+              beginAtZero: true,
+              min: 0,
+              suggestedMax: 100,
+            }),
+          },
+          {
+            title: (items) => {
+              const item = items[0];
+              return `${item.dataset.label} · q${item.raw.quality}`;
+            },
+            label: (item) => [
+              `平均 SSIMULACRA2: ${item.raw.avgScore}`,
+              `平均体积: ${formatBytes(item.raw.avgBytes)}`,
+              `失败次数: ${item.raw.failures}`,
+            ],
+          },
+        );
+      }
+
+      function renderNormalizedQualityChart(lines) {
+        const datasets = lines
+          .map((line) => ({
+            format: line.format,
+            points: line.points.filter((point) => point.avgScore != null),
+          }))
+          .filter((line) => line.points.length > 0)
+          .map((line) =>
+            createDataset(
+              line.format,
+              line.points.map((point) => ({
+                x: point.quality,
+                y: roundNumber(point.avgScore, 2),
+                ...point,
+              })),
+            ),
+          );
+
+        createLineChart(
+          'normalized-quality-chart',
+          datasets,
+          {
+            x: createLinearAxis('标称质量（校准后）'),
+            y: createLinearAxis('SSIMULACRA2', {
+              beginAtZero: true,
+              min: 0,
+              suggestedMax: 100,
+            }),
+          },
+          {
+            title: (items) => {
+              const item = items[0];
+              return `${item.dataset.label} · 公共 q${item.raw.quality}`;
+            },
+            label: (item) => [
+              `原生编码质量: ${item.raw.nativeQuality.toFixed(1)}`,
+              `平均 SSIMULACRA2: ${item.raw.y.toFixed(2)}`,
+            ],
+          },
+        );
+      }
+
+      function renderSizeLineChart(lines, formatOrder) {
+        const orderedLines = lines
+          .filter((line) => line.points.length > 0)
+          .slice()
+          .sort(
+            (left, right) => formatOrder.indexOf(left.format) - formatOrder.indexOf(right.format),
+          );
+        const datasets = orderedLines.map((line) =>
+          createDataset(
+            line.format,
+            line.points
+              .filter((point) => point.avgScore != null && point.avgBytes != null)
+              .sort((left, right) => left.quality - right.quality)
+              .map((point) => ({
+                x: point.avgScore,
+                y: point.avgBytes,
+                ...point,
+              })),
+          ),
+        );
+
+        createLineChart(
+          'size-chart',
+          datasets.filter((dataset) => dataset.data.length > 0),
+          {
+            x: createLinearAxis('SSIMULACRA2', {
+              beginAtZero: true,
+              min: 0,
+              suggestedMax: 100,
+            }),
+            y: createLinearAxis('产物体积', {
+              beginAtZero: true,
+              tickCallback: (value) => formatBytes(value),
+            }),
+          },
+          {
+            title: (items) => {
+              const item = items[0];
+              return `${item.dataset.label} · q${item.raw.quality}`;
+            },
+            label: (item) => [
+              `平均 SSIMULACRA2: ${item.raw.avgScore}`,
+              `平均体积: ${formatBytes(item.raw.avgBytes)}`,
+              `失败次数: ${item.raw.failures}`,
+            ],
+          },
+        );
+      }
+
+      function clearCharts() {
+        destroyChart('quality-chart');
+        destroyChart('normalized-quality-chart');
+        destroyChart('size-chart');
+      }
+
+      function showError(message) {
+        statusText.textContent = message;
+        summaryGrid.innerHTML = `<div class="empty-state">${message}</div>`;
+        sourceFilter.hidden = true;
+        sourceList.innerHTML = '';
+        clearCharts();
+        footerNote.textContent = '';
+      }
+
+      function renderCharts(report, aggregates) {
+        renderQualityChart(aggregates.lines);
+        const normalizedLines = aggregates.lines.map((line) => ({
+          format: line.format,
+          points: report.qualities.map((quality) => {
+            const nativeQuality = normalizeQuality(line.format, quality);
+            return {
+              quality,
+              nativeQuality,
+              avgScore: interpolateScore(line.points, nativeQuality),
+            };
+          }),
+        }));
+        renderNormalizedQualityChart(normalizedLines);
+        const formatOrder = report.formats ?? aggregates.lines.map((line) => line.format);
+        renderSizeLineChart(aggregates.lines, formatOrder);
+      }
+
+      function renderNoSourceSelection() {
+        statusText.textContent = '请至少选择一个图源';
+        summaryGrid.innerHTML =
+          '<div class="empty-state">请选择一个或多个图源后查看平均数据。</div>';
+        clearCharts();
+        footerNote.textContent = '';
+      }
+
+      function renderSelectedReport() {
+        if (currentReport == null) {
+          return;
+        }
+
+        const selectedImages = getSelectedImages(currentReport);
+        const totalImages = currentReport.images?.length ?? 0;
+        if (selectedImages.length === 0) {
+          renderNoSourceSelection();
+          return;
+        }
+
+        const selectedReport = {
+          ...currentReport,
+          images: selectedImages,
+        };
+        const aggregates = buildAggregates(selectedReport);
+        const source = currentMetadata?.source ?? 'report.json';
+
+        statusText.textContent = `已加载 ${source} · 已选择 ${selectedImages.length}/${totalImages} 个图源`;
+        renderSummary(
+          selectedReport,
+          aggregates,
+          `${source} · 已选择 ${selectedImages.length}/${totalImages} 个图源`,
+        );
+        renderCharts(selectedReport, aggregates);
+        footerNote.textContent = `说明：原始图表按“格式 + 质量档位”聚合平均值；校准图使用独立的平滑格式曲线把公共 quality 转换为原生编码质量，benchmark 分数仅用于展示。当前选中 ${selectedImages.length}/${totalImages} 张输入图，失败项 ${aggregates.failureCount} 个，失败点不会进入均值。`;
+      }
+
+      function renderReport(report, metadata) {
+        if (report == null || Array.isArray(report.images) === false) {
+          currentReport = null;
+          currentMetadata = null;
+          selectedSourceKeys = new Set();
+          showError('report.json 结构不符合预期。');
+          return;
+        }
+
+        currentReport = report;
+        currentMetadata = metadata;
+        selectedSourceKeys = new Set(
+          report.images.map((image, index) => getImageSourceKey(image, index)),
+        );
+        renderSourceFilter(report);
+        renderSelectedReport();
+      }
+
+      async function loadDefaultReport() {
+        try {
+          statusText.textContent = '正在读取同目录 report.json...';
+          const response = await fetch('./output/report.json', { cache: 'no-store' });
+          if (response.ok === false) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          const report = await response.json();
+          renderReport(report, { source: '同目录 report.json' });
+        } catch (error) {
+          showError(
+            `自动读取失败。请点击“选择 report.json”手动导入。失败原因：${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
+      }
+
+      loadDefaultReport();
+    </script>
+  </body>
+</html>

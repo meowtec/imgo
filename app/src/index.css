@@ -1,0 +1,33 @@
+@import './styles/base.css';
+@import './styles/animation.scss';
+
+body[class^='lock-scroll'] {
+  overflow: hidden;
+}
+
+.imgo-embedded {
+  min-width: 0;
+  min-height: 100%;
+  container: imgo-app / inline-size;
+}
+
+.imgo-embedded-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.imgo-progress-track-zebra {
+  background: repeating-linear-gradient(
+    -45deg,
+    oklch(0.93 0 0) 0,
+    oklch(0.93 0 0) 4px,
+    oklch(0.89 0 0) 4px,
+    oklch(0.89 0 0) 8px
+  );
+}
+
+@container imgo-app (max-width: 48rem) {
+  .imgo-header-stats {
+    display: none;
+  }
+}

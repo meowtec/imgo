@@ -1,0 +1,32 @@
+[
+  {
+    "date": "2026-08-20",
+    "scope": "app",
+    "macrostructure": "Workbench",
+    "theme": "Coral",
+    "nav": "N9",
+    "footer": "Ft5",
+    "enrichment": "interactive web app in application window",
+    "brief": "IMGo bilingual homepage with an embedded image optimization workbench"
+  },
+  {
+    "date": "2026-07-30",
+    "macrostructure": "Split Studio",
+    "theme": "Coral",
+    "theme_axes": "light / grotesk-sans / warm",
+    "enrichment": "Tier-A CSS interface abstraction",
+    "nav": "N5 Floating pill",
+    "footer": "Ft2 Inline single line",
+    "brief": "IMGo homepage simplified around one product message and abstract app preview"
+  },
+  {
+    "date": "2026-07-30",
+    "macrostructure": "Workbench",
+    "theme": "Cobalt",
+    "theme_axes": "light / grotesk-sans / cool",
+    "enrichment": "Tier-A CSS workbench",
+    "nav": "N9 Edge-aligned minimal",
+    "footer": "Ft5 Statement",
+    "brief": "IMGo website homepage austere redesign"
+  }
+]

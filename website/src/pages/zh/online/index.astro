@@ -1,0 +1,46 @@
+---
+import AppShellLayout from '../../../layouts/AppShellLayout.astro';
+import { getSiteCopy, localeRoutes } from '../../../i18n';
+import '../../../../tokens.css';
+import '../../../../../app/src/styles/base.css';
+
+const locale = 'zh';
+const copy = getSiteCopy(locale);
+const routes = localeRoutes[locale];
+---
+
+<AppShellLayout
+  locale={locale}
+  title={copy.seo.appTitle}
+  description={copy.seo.appDescription}
+  pathname={routes.app}
+  image="/og/imgo-zh.png"
+>
+  <div class="online-shell">
+    <div
+      id="imgo-root"
+      class="online-app"
+      data-home-href={routes.home}
+      data-locale={locale}
+    ></div>
+  </div>
+</AppShellLayout>
+
+<script>
+  import '../../../scripts/mount-app';
+</script>
+
+<style>
+  .online-shell {
+    display: flex;
+    min-height: 100dvh;
+    flex-direction: column;
+    background: var(--color-paper);
+    color: var(--color-ink-2);
+  }
+
+  .online-app {
+    flex: 1;
+    min-width: 0;
+  }
+</style>

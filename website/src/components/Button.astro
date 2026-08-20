@@ -1,0 +1,111 @@
+---
+import { cn } from '../utils';
+interface Props extends astroHTML.JSX.AnchorHTMLAttributes {
+  variant?: 'primary' | 'secondary' | 'ghost';
+}
+
+const { class: externalClass = '', variant, ...restProps } = Astro.props;
+---
+
+<a
+  class={cn(
+    'button',
+    {
+      primary: 'button--primary',
+      secondary: 'button--secondary',
+      ghost: 'button--ghost',
+    }[variant || 'primary'],
+    externalClass
+  )}
+  {...restProps}
+>
+  <slot />
+</a>
+
+<style>
+  .button {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    border: var(--rule-hair) solid transparent;
+    border-radius: var(--radius-round);
+    padding: var(--space-sm) var(--space-lg);
+    color: var(--button-fg);
+    background: var(--button-bg);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      color var(--dur-short) var(--ease-out),
+      background-color var(--dur-short) var(--ease-out),
+      border-color var(--dur-short) var(--ease-out),
+      transform var(--dur-micro) var(--ease-out);
+  }
+
+  .button--primary {
+    --button-bg: var(--color-ink);
+    --button-fg: var(--color-paper);
+    border-color: var(--color-ink);
+  }
+
+  .button--secondary {
+    --button-bg: var(--color-paper);
+    --button-fg: var(--color-ink);
+    border-color: var(--color-rule-strong);
+  }
+
+  .button--ghost {
+    --button-bg: transparent;
+    --button-fg: var(--color-ink-2);
+    padding-inline: var(--space-sm);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .button--primary:hover {
+      background: var(--color-ink-2);
+      border-color: var(--color-ink-2);
+    }
+
+    .button--secondary:hover,
+    .button--ghost:hover {
+      color: var(--color-accent);
+      border-color: var(--color-accent);
+    }
+  }
+
+  .button:active {
+    transform: translateY(1px);
+  }
+
+  .button:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  .button[aria-disabled='true'],
+  .button[data-state='loading'] {
+    opacity: 0.56;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .button[data-state='error'] {
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+  }
+
+  .button[data-state='success'] {
+    border-color: var(--color-success);
+    color: var(--color-success);
+  }
+</style>

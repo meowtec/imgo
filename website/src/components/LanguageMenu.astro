@@ -1,0 +1,119 @@
+---
+import { Icon } from 'astro-icon/components';
+import type { Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  label: string;
+  currentHref: string;
+  alternateHref: string;
+}
+
+const { locale, label, currentHref, alternateHref } = Astro.props;
+const enHref = locale === 'en' ? currentHref : alternateHref;
+const zhHref = locale === 'zh' ? currentHref : alternateHref;
+---
+
+<details class="language-menu">
+  <summary aria-label={label} title={label}>
+    <Icon name="mdi:translate" aria-hidden="true" />
+  </summary>
+  <div class="language-menu__panel">
+    <a href={enHref} lang="en" aria-current={locale === 'en' ? 'page' : undefined}>English</a>
+    <a href={zhHref} lang="zh-CN" aria-current={locale === 'zh' ? 'page' : undefined}>中文</a>
+  </div>
+</details>
+
+<style>
+  .language-menu {
+    position: relative;
+  }
+
+  .language-menu summary {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    border: var(--rule-hair) solid var(--color-rule);
+    border-radius: var(--radius-round);
+    color: var(--color-ink);
+    background: var(--color-surface);
+    cursor: pointer;
+    list-style: none;
+    transition:
+      border-color var(--dur-short) var(--ease-out),
+      transform var(--dur-micro) var(--ease-out);
+  }
+
+  .language-menu summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .language-menu summary :global(svg) {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
+  .language-menu summary:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  .language-menu[open] summary {
+    border-color: var(--color-rule-strong);
+  }
+
+  .language-menu summary:active,
+  .language-menu__panel a:active {
+    transform: translateY(1px);
+  }
+
+  .language-menu__panel {
+    position: absolute;
+    inset-block-start: calc(100% + var(--space-xs));
+    inset-inline-end: 0;
+    z-index: var(--z-popover);
+    display: grid;
+    min-width: 9rem;
+    padding: var(--space-xs);
+    border: var(--rule-hair) solid var(--color-rule);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-menu);
+  }
+
+  .language-menu__panel a {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+    padding-inline: var(--space-sm);
+    border-radius: var(--radius-control);
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .language-menu__panel a[aria-current='page'] {
+    color: var(--color-ink);
+    background: var(--color-paper-2);
+  }
+
+  .language-menu__panel a:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: -2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .language-menu summary:hover {
+      border-color: var(--color-rule-strong);
+      transform: translateY(-1px);
+    }
+
+    .language-menu__panel a:hover {
+      color: var(--color-ink);
+      background: var(--color-paper-2);
+    }
+  }
+</style>

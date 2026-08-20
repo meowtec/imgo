@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  EMSDK_VERSION: 6.0.4
+  NODE_VERSION: 24.18.0
+  PNPM_VERSION: 11.17.0
+  RUST_VERSION: 1.97.1
+
+jobs:
+  check:
+    name: Lint, test, and build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential clang cmake nasm ninja-build pkg-config
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+          toolchain: ${{ env.RUST_VERSION }}
+          targets: wasm32-unknown-unknown,wasm32-unknown-emscripten
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ci-emsdk-${{ env.EMSDK_VERSION }}-${{ hashFiles('deps/*.patch') }}
+          workspaces: . -> target
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-pack@0.15.0
+          fallback: none
+
+      - uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: ${{ env.EMSDK_VERSION }}
+          actions-cache-folder: emsdk-cache
+
+      - name: Apply native source patches
+        run: pnpm run init:src
+
+      - name: Build shared JS bindings
+        run: pnpm run rsts
+
+      - name: Install workspace dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build minifier JS wrapper
+        run: pnpm --filter @imgo/minifier-js build
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Test
+        run: pnpm test

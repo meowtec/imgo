@@ -1,0 +1,412 @@
+---
+import type { Locale } from '../i18n';
+import { getSiteCopy, localeRoutes } from '../i18n';
+import Button from './Button.astro';
+import Header from './Header.astro';
+import WebApp from './WebApp.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getSiteCopy(locale);
+const routes = localeRoutes[locale];
+const downloadUrl = 'https://github.com/meowtec/imgo/releases';
+const githubUrl = 'https://github.com/meowtec/imgo';
+---
+
+<div class="page-shell">
+  <Header {locale} appHref="#web-app" />
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__copy">
+        <h1 id="hero-title">{copy.hero.title}</h1>
+        <p>{copy.hero.description}</p>
+        <div class="hero__actions" aria-label={copy.hero.actionsLabel}>
+          <Button href="#web-app">{copy.hero.openApp}</Button>
+          <Button variant="secondary" href={downloadUrl} aria-label={copy.hero.downloadApp}>
+            {copy.hero.downloadApp}
+          </Button>
+        </div>
+      </div>
+      <ul class="proof-list" aria-label={copy.hero.proofLabel}>
+        {copy.hero.proof.map((item) => <li>{item}</li>)}
+      </ul>
+    </section>
+
+    <section id="web-app" class="workbench section">
+      <WebApp {locale} />
+    </section>
+
+    <section class="privacy" aria-labelledby="privacy-title">
+      <div class="privacy__inner">
+        <div class="privacy__copy">
+          <h2 id="privacy-title">{copy.privacy.title}</h2>
+          <p>{copy.privacy.description}</p>
+        </div>
+        <div class="platforms">
+          <article>
+            <h3>{copy.privacy.webTitle}</h3>
+            <p>{copy.privacy.webDescription}</p>
+          </article>
+          <article>
+            <h3>{copy.privacy.nativeTitle}</h3>
+            <p>{copy.privacy.nativeDescription}</p>
+          </article>
+        </div>
+        <div class="format-list">
+          <span>{copy.formats.label}</span>
+          <ul>
+            {copy.formats.names.map((format) => <li>{format}</li>)}
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p class="site-footer__statement">{copy.footer.statement}</p>
+    <div class="site-footer__meta">
+      <span>IMGo</span>
+      <nav aria-label={copy.footer.navigationLabel}>
+        <a href={githubUrl}>{copy.footer.github}</a>
+        <a href={downloadUrl}>{copy.footer.download}</a>
+        <a href={routes.alternateHome} lang={locale === 'en' ? 'zh-CN' : 'en'}>
+          {copy.footer.alternateLanguage}
+        </a>
+      </nav>
+      <span>© {new Date().getFullYear()} · {copy.footer.copyright}</span>
+    </div>
+  </footer>
+</div>
+
+<style>
+  /* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5
+   * Hallmark · genre: modern-minimal · macrostructure: Workbench · design-system: design.md
+   * tone: utilitarian · theme: Coral · enrichment: interactive web app · nav: N9 · footer: Ft5
+   * contrast: pass (40-41) · slop: pass (42-45) · honest: pass (46)
+   * tokens: pass (48) · responsive: pass (49) · icons: pass (30) · mobile: pass (34, 49-57)
+   */
+  .page-shell {
+    min-height: 100dvh;
+    background: var(--color-paper);
+    color: var(--color-ink-2);
+  }
+
+  main {
+    display: grid;
+  }
+
+  h1,
+  h2,
+  h3,
+  p,
+  figure,
+  ol,
+  ul {
+    margin: 0;
+  }
+
+  h1,
+  h2,
+  h3 {
+    min-width: 0;
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-style: normal;
+    overflow-wrap: anywhere;
+  }
+
+  h1 {
+    max-width: 12ch;
+    font-size: var(--text-display);
+    line-height: 0.98;
+  }
+
+  h2 {
+    max-width: 18ch;
+    font-size: var(--text-3xl);
+    line-height: 1.05;
+  }
+
+  h3 {
+    font-size: var(--text-lg);
+    line-height: 1.2;
+  }
+
+  .hero,
+  .section,
+  .site-footer {
+    width: min(calc(100% - 2rem), var(--page-max));
+    margin-inline: auto;
+  }
+
+  .hero {
+    display: grid;
+    gap: var(--space-xl);
+    padding-block: var(--space-xl);
+  }
+
+  .hero__copy {
+    display: grid;
+    gap: var(--space-lg);
+  }
+
+  .hero__copy > p {
+    max-width: 54ch;
+    color: var(--color-muted);
+    font-size: var(--text-md);
+    line-height: 1.65;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .proof-list {
+    display: grid;
+    padding: 0;
+    border-block: var(--rule-hair) solid var(--color-rule);
+    list-style: none;
+  }
+
+  .proof-list li {
+    display: flex;
+    min-height: 3.5rem;
+    align-items: center;
+    border-block-end: var(--rule-hair) solid var(--color-rule);
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+  }
+
+  .proof-list li:last-child {
+    border-block-end: 0;
+  }
+
+  .section {
+    padding-block: var(--space-xl);
+  }
+
+  .workbench {
+    scroll-margin-block-start: var(--space-lg);
+  }
+
+  .privacy {
+    color: var(--color-paper-2);
+    background: var(--color-ink);
+  }
+
+  .privacy__inner {
+    display: grid;
+    width: min(calc(100% - 2rem), var(--page-max));
+    gap: var(--space-xl);
+    margin-inline: auto;
+    padding-block: var(--space-xl);
+  }
+
+  .privacy h2,
+  .privacy h3 {
+    color: var(--color-paper);
+  }
+
+  .privacy__copy {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .privacy__copy p,
+  .platforms p {
+    max-width: 60ch;
+    color: var(--color-paper-muted);
+    line-height: 1.65;
+  }
+
+  .platforms {
+    display: grid;
+    border-block-start: var(--rule-hair) solid var(--color-ink-rule);
+  }
+
+  .platforms article {
+    display: grid;
+    gap: var(--space-sm);
+    padding-block: var(--space-md);
+    border-block-end: var(--rule-hair) solid var(--color-ink-rule);
+  }
+
+  .format-list {
+    display: grid;
+    gap: var(--space-sm);
+  }
+
+  .format-list > span {
+    color: var(--color-paper-muted);
+    font-size: var(--text-xs);
+  }
+
+  .format-list ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-lg);
+    padding: 0;
+    list-style: none;
+  }
+
+  .format-list li {
+    color: var(--color-paper);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+  }
+
+  .site-footer {
+    display: grid;
+    gap: var(--space-lg);
+    padding-block: var(--space-xl) var(--space-md);
+  }
+
+  .site-footer__statement {
+    max-width: 28ch;
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    line-height: 1.05;
+  }
+
+  .site-footer__meta {
+    display: grid;
+    gap: var(--space-sm);
+    padding-block-start: var(--space-md);
+    border-block-start: var(--rule-hair) solid var(--color-rule);
+    color: var(--color-neutral);
+    font-size: var(--text-sm);
+  }
+
+  .site-footer nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm) var(--space-lg);
+  }
+
+  .site-footer a {
+    display: inline-flex;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-control);
+    color: var(--color-ink);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .site-footer a:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  .site-footer a:active {
+    transform: translateY(1px);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .site-footer a:hover {
+      color: var(--color-accent-strong);
+    }
+  }
+
+  @media (min-width: 40rem) {
+    .hero,
+    .section,
+    .site-footer,
+    .privacy__inner {
+      width: min(calc(100% - 3rem), var(--page-max));
+    }
+
+    .proof-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .proof-list li {
+      padding-inline: var(--space-md);
+      border-block-end: 0;
+      border-inline-end: var(--rule-hair) solid var(--color-rule);
+    }
+
+    .proof-list li:first-child {
+      padding-inline-start: 0;
+    }
+
+    .proof-list li:last-child {
+      border-inline-end: 0;
+    }
+
+    .platforms {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .platforms article {
+      padding-inline: var(--space-lg);
+      border-inline-end: var(--rule-hair) solid var(--color-ink-rule);
+    }
+
+    .platforms article:first-child {
+      padding-inline-start: 0;
+    }
+
+    .platforms article:last-child {
+      border-inline-end: 0;
+    }
+
+    .site-footer__meta {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+    }
+
+    .site-footer nav {
+      justify-content: center;
+    }
+  }
+
+  @media (min-width: 60rem) {
+    .hero {
+      grid-template-columns: minmax(0, 1fr) minmax(24rem, 0.75fr);
+      align-items: end;
+      gap: var(--space-3xl);
+      padding-block: var(--space-md) var(--space-lg);
+    }
+
+    .proof-list {
+      grid-template-columns: minmax(0, 1fr);
+      border-block: 0;
+      border-inline-start: var(--rule-hair) solid var(--color-rule);
+      padding-inline-start: var(--space-xl);
+    }
+
+    .proof-list li,
+    .proof-list li:first-child {
+      padding-inline: 0;
+      border-block-end: var(--rule-hair) solid var(--color-rule);
+      border-inline-end: 0;
+    }
+
+    .proof-list li:last-child {
+      border-block-end: 0;
+    }
+
+    .privacy__inner {
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+      align-items: start;
+    }
+
+    .format-list {
+      grid-column: 1 / -1;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      padding-block-start: var(--space-md);
+      border-block-start: var(--rule-hair) solid var(--color-ink-rule);
+    }
+  }
+</style>

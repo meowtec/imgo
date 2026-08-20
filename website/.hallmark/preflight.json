@@ -1,0 +1,10 @@
+{
+  "date": "2026-07-30",
+  "font_stack": "none declared before redesign; Cobalt loads Space Grotesk, Inter, JetBrains Mono",
+  "palette": "no existing design tokens; Cobalt OKLCH tokens introduced",
+  "motion": "motion-cut; no motion dependency installed",
+  "spacing": "Tailwind v4 present; Hallmark 4pt token scale introduced",
+  "framework": "Astro 7 with Tailwind v4",
+  "preserve": ["Astro route", "logo asset", "product/copy intent"],
+  "introduce": ["Workbench macrostructure", "Cobalt theme", "tokenized type/color/spacing"]
+}

@@ -1,0 +1,125 @@
+---
+import logoImg from '../assets/logo.png';
+import { getSiteCopy, localeRoutes, type Locale } from '../i18n';
+import LanguageMenu from './LanguageMenu.astro';
+
+interface Props {
+  locale: Locale;
+  appHref?: string;
+}
+
+const { locale, appHref } = Astro.props;
+const copy = getSiteCopy(locale);
+const routes = localeRoutes[locale];
+---
+
+<!-- Keep the brand treatment in sync with app/src/components/header/index.tsx. -->
+<header class="site-header">
+  <a class="wordmark" href={routes.home} aria-label={copy.nav.homeLabel}>
+    <img src={logoImg.src} width="28" height="28" alt="" />
+    <span>IMGo</span>
+  </a>
+  <nav aria-label={copy.nav.primaryLabel}>
+    <LanguageMenu
+      {locale}
+      label={copy.nav.languageLabel}
+      currentHref={routes.home}
+      alternateHref={routes.alternateHome}
+    />
+    <a class="nav-action" href={appHref ?? routes.app}>{copy.nav.openApp}</a>
+  </nav>
+</header>
+
+<style>
+  /* Hallmark · genre: modern-minimal · macrostructure: Workbench · design-system: design.md · nav: N9 */
+  .site-header {
+    display: flex;
+    width: min(calc(100% - 2rem), var(--page-max));
+    min-height: var(--header-height);
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    margin-inline: auto;
+    padding-block: var(--space-md);
+  }
+
+  .wordmark {
+    display: inline-flex;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    border-radius: var(--radius-control);
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .wordmark img {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-control);
+  }
+
+  .wordmark:focus-visible,
+  .nav-action:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  .wordmark:active {
+    transform: translateY(1px);
+  }
+
+  nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  .nav-action {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    border: var(--rule-hair) solid var(--color-ink);
+    border-radius: var(--radius-round);
+    padding-inline: var(--space-md);
+    color: var(--color-paper);
+    background: var(--color-ink);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      background-color var(--dur-short) var(--ease-out),
+      transform var(--dur-micro) var(--ease-out);
+  }
+
+  .nav-action:active {
+    transform: translateY(1px);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .nav-action:hover {
+      background: var(--color-ink-2);
+      transform: translateY(-1px);
+    }
+  }
+
+  @media (max-width: 22rem) {
+    .wordmark {
+      justify-content: flex-start;
+    }
+  }
+
+  @media (max-width: 22rem) {
+    .wordmark span {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,96 @@
+/* Hallmark · tokens: Coral · paper-band: light · display-style: grotesk-sans · accent-hue: warm */
+:root {
+  --color-paper: oklch(98.5% 0.006 48);
+  --color-paper-2: oklch(95.5% 0.009 48);
+  --color-surface: oklch(99.4% 0.004 48);
+  --color-nav: oklch(99% 0.005 48);
+  --color-ink: oklch(20% 0.012 38);
+  --color-ink-2: oklch(29% 0.012 38);
+  --color-ink-rule: oklch(42% 0.012 38);
+  --color-muted: oklch(42% 0.012 42);
+  --color-neutral: oklch(42% 0.012 42);
+  --color-paper-muted: oklch(82% 0.008 48);
+  --color-rule: oklch(87% 0.012 48);
+  --color-rule-strong: oklch(74% 0.014 48);
+  --color-accent: oklch(55% 0.19 28);
+  --color-accent-strong: oklch(48% 0.18 28);
+  --color-accent-ink: oklch(98.5% 0.006 48);
+  --color-focus: oklch(55% 0.19 28);
+  --color-danger: oklch(52% 0.18 28);
+  --color-success: oklch(48% 0.14 150);
+  --color-preview-warm: oklch(70% 0.12 55);
+  --color-preview-cool: oklch(67% 0.08 220);
+  --color-preview-deep: oklch(35% 0.05 38);
+  --color-preview-light: oklch(92% 0.04 65);
+  --color-window-bar: oklch(96.5% 0.006 48);
+  --color-window-rule: oklch(82% 0.012 48);
+  --color-window-control-rule: oklch(45% 0.02 38 / 0.22);
+  --color-window-close: oklch(66% 0.2 28);
+  --color-window-minimize: oklch(79% 0.16 85);
+  --color-window-zoom: oklch(67% 0.16 145);
+
+  --font-display: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --space-3xs: 0.125rem;
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+  --space-4xl: 9rem;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.125rem;
+  --text-lg: 1.375rem;
+  --text-xl: 1.75rem;
+  --text-2xl: 2.25rem;
+  --text-3xl: 3rem;
+  --text-display: clamp(2.75rem, 7vw, 5.25rem);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-long: 420ms;
+
+  --rule-hair: 1px;
+  --radius-control: 6px;
+  --radius-card: 8px;
+  --radius-preview: 8px;
+  --radius-panel: 8px;
+  --radius-window: 16px;
+  --radius-round: 999px;
+  --shadow-panel: 0 24px 60px -42px oklch(20% 0.02 38 / 0.28);
+  --shadow-nav: 0 12px 36px -24px oklch(20% 0.02 38 / 0.24);
+  --shadow-menu: 0 18px 40px -24px oklch(20% 0.02 38 / 0.32);
+  --shadow-pin: 0 8px 18px -8px oklch(20% 0.02 38 / 0.4);
+  --shadow-window:
+    0 32px 80px -42px oklch(20% 0.02 38 / 0.42), 0 12px 28px -20px oklch(20% 0.02 38 / 0.26);
+  --page-gutter: clamp(1rem, 5vw, 5.5rem);
+  --page-max: 80rem;
+  --app-max: 60rem;
+  --header-max: 52rem;
+  --header-height: 4.75rem;
+  --window-titlebar-height: 2.75rem;
+  --window-control-size: 0.75rem;
+  --window-content-height: clamp(32rem, 64vw, 42rem);
+
+  --z-base: 1;
+  --z-raised: 10;
+  --z-popover: 100;
+  --z-sticky: 200;
+}
+
+@media (min-resolution: 2dppx) {
+  :root {
+    --rule-hair: 0.5px;
+  }
+}

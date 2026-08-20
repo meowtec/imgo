@@ -1,0 +1,24 @@
+diff --git a/libde265/x86/sse.cc b/libde265/x86/sse.cc
+index 735fd530..e0001826 100644
+--- a/libde265/x86/sse.cc
++++ b/libde265/x86/sse.cc
+@@ -141,7 +141,9 @@ void init_acceleration_functions_avx2(struct acceleration_functions* accel)
+   // __builtin_cpu_supports("avx2") handles the OSXSAVE / XGETBV (YMM-enabled)
+   // checks internally, so this is safe to call on any CPU. This TU is *not*
+   // compiled with -mavx2, so reaching here never executes an AVX2 instruction.
+-#if defined(__GNUC__) && !defined(__EMSCRIPTEN__)
++  // NB: Apple clang emits references to GCC's __cpu_model/__cpu_indicator_init
++  // runtime, which the macOS toolchain does not provide, so skip it there.
++#if defined(__GNUC__) && !defined(__EMSCRIPTEN__) && !defined(__APPLE__)
+   __builtin_cpu_init();
+   if (__builtin_cpu_supports("avx2")) {
+     accel->transform_add_8[2] = transform_16x16_add_8_avx2;
+@@ -159,7 +161,7 @@ void init_acceleration_functions_avx2(struct acceleration_functions* accel)
+ void init_acceleration_functions_avx512(struct acceleration_functions* accel)
+ {
+ #if HAVE_AVX512
+-#if defined(__GNUC__) && !defined(__EMSCRIPTEN__)
++#if defined(__GNUC__) && !defined(__EMSCRIPTEN__) && !defined(__APPLE__)
+   __builtin_cpu_init();
+   // need AVX-512F + AVX-512BW (16-bit ops). __builtin_cpu_supports handles the
+   // OS (XCR0/ZMM-enabled) check. This TU is not compiled with -mavx512*.

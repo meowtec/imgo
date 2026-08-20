@@ -1,0 +1,15 @@
+diff --git a/libheif/CMakeLists.txt b/libheif/CMakeLists.txt
+index 6f6bda27..baf2ba28 100644
+--- a/libheif/CMakeLists.txt
++++ b/libheif/CMakeLists.txt
+@@ -253,7 +253,9 @@ endif()
+ target_compile_definitions(heif
+         PUBLIC
+         LIBHEIF_EXPORTS
+-        HAVE_VISIBILITY)
++        HAVE_VISIBILITY
++        LIBDE265_STATIC_BUILD
++        KVZ_STATIC_LIB)
+ 
+ if (PLUGIN_LOADING_SUPPORTED_AND_ENABLED)
+     target_compile_definitions(heif PRIVATE ENABLE_PLUGIN_LOADING=1)

@@ -1,0 +1,69 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "bundle": {
+    "active": true,
+    "category": "GraphicsAndDesign",
+    "copyright": "",
+    "targets": "all",
+    "externalBin": [],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": ""
+    },
+    "longDescription": "",
+    "macOS": {
+      "entitlements": null,
+      "exceptionDomain": "",
+      "frameworks": [],
+      "providerShortName": null,
+      "signingIdentity": null,
+      "infoPlist": "Info.plist"
+    },
+    "resources": ["i18n"],
+    "shortDescription": "",
+    "linux": {
+      "deb": {
+        "depends": []
+      }
+    }
+  },
+  "build": {
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist",
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:12315"
+  },
+  "productName": "IMGo",
+  "mainBinaryName": "IMGo",
+  "version": "../package.json",
+  "identifier": "com.meowtec.imgo",
+  "plugins": {},
+  "app": {
+    "windows": [],
+    "security": {
+      "assetProtocol": {
+        "scope": {
+          "allow": ["$CACHE/**", "$TEMP/**", "$APPCACHE/**", "$DOWNLOAD/**"],
+          "deny": [],
+          "requireLiteralLeadingDot": null
+        },
+        "enable": true
+      },
+      "csp": {
+        "img-src": "'self' asset: http://asset.localhost blob: data:",
+        "connect-src": ["'self'", "ipc: http://ipc.localhost", "tauri://localhost"],
+        "default-src": "'self' asset:",
+        "script-src": "'self' 'wasm-unsafe-eval'",
+        "style-src": "'unsafe-inline' 'self'"
+      }
+    }
+  }
+}

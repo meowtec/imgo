@@ -1,0 +1,41 @@
+{
+  "name": "imgo",
+  "private": true,
+  "type": "module",
+  "description": "PNG/JPEG optimization app",
+  "homepage": "https://github.com/meowtec/imgo",
+  "author": "meowtec<bertonzh@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meowtec/imgo.git"
+  },
+  "engines": {
+    "node": "^24.18.0",
+    "pnpm": "^11"
+  },
+  "packageManager": "pnpm@11.17.0",
+  "scripts": {
+    "build": "pnpm run rsts && pnpm --filter @imgo/minifier-js build && pnpm --filter @imgo/minifier-js build:wasm && pnpm --filter @imgo/web build",
+    "tscheck": "cd app && tsc --noEmit",
+    "test:js": "pnpm -r --if-present test",
+    "test:rust": "cargo test -p imgo-shared --lib && cargo test -p minifier --lib",
+    "test": "npm run test:js && npm run test:rust",
+    "fmt": "cargo fmt -p minifier minifier-js minifier-cli imgo-shared IMGo && npx prettier \"**/{src,js-src}/**/*.{ts,tsx,scss,css}\" -w",
+    "oxlint": "oxlint app/src website/src",
+    "lint": "cargo fmt -p minifier minifier-js minifier-cli imgo-shared IMGo --check && npm run tscheck && npm run oxlint",
+    "init:src": "cd deps/libheif-sys && git reset --hard && git apply ../libheif-sys.patch && cd ../libde265 && git reset --hard && git apply ../libde265.patch && cd ../libheif && git reset --hard && git apply ../libheif.patch && cd ../jpegxl-rs && git reset --hard && git apply ../jpegxl-rs.patch",
+    "rsts": "cd crates/shared-js && wasm-pack build --release --scope imgo",
+    "init": "git submodule update --init --recursive && pnpm run init:src && npm run rsts && pnpm install && pnpm --filter @imgo/minifier-js build && pnpm --filter @imgo/minifier-js build:wasm",
+    "create-patches": "cd deps/libheif-sys && git diff > ../libheif-sys.patch && cd ../libheif && git diff > ../libheif.patch&& cd ../jpegxl-rs && git diff > ../jpegxl-rs.patch",
+    "benchmark:quality": "node benchmark/quality-calibration.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "oxlint": "^1.26.0",
+    "oxlint-tsgolint": "^7.0.2001",
+    "prettier": "^3.9.6",
+    "tsx": "^4.23.1",
+    "typescript": "^6.0.3"
+  }
+}

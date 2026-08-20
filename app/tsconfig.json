@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "types": ["vite-plugin-svg-sprite/typings/react"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react",
+    "strict": true,
+    "target": "ES2020",
+    "module": "ES2020",
+    "lib": ["ES2022", "DOM"],
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "moduleResolution": "Bundler",
+    "outDir": "./_dist",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/gen-types/*": ["./src-tauri/bindings/*"],
+      "@/platform": ["./src/platform/tauri"]
+    },
+    "noEmit": true
+  }
+}

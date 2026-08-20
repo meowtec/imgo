@@ -1,0 +1,50 @@
+[package]
+name = "minifier"
+version = "0.1.0"
+edition = "2021"
+build = "build.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+log = "0.4"
+image = { version = "0.25", default-features = false}
+mozjpeg = "0.10.13"
+# "parallel", "zopfli" not supported or need more memory on wasm
+oxipng = { version = "10.1.1", default-features = false }
+png = "0.18.1"
+webp = { git = "https://github.com/meowtec/rust-webp.git", branch = "feat/memory-reduce" }
+# disable thread_local for avoiding versions conflict
+imagequant = { version = "4.4.1", default-features = false }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_repr = "0.1.21"
+minifier-utils = { path = "../minifier-utils" }
+debug-ignore = "1.0"
+# requirements:
+#   pip3 install meson;
+#   macOS: brew install ninja;
+#   linux: apt-get install ninja-build
+#   windows:
+#     - install meson & ninja & vs
+#     - and make sure cl.exe is in PATH (use `Developer Command Prompt for VS` to install cargo dependencies)
+# see more: https://github.com/mesonbuild/meson/blob/master/docs/markdown/Continuous-Integration.md
+# libavif = "0.11.0"
+# libavif-sys = "0.15.0"
+libavif-sys = { version = "0.17.0", default-features = false, features = ["codec-aom"] }
+rgb = "0.8"
+jpegxl-rs = { version = "0.15.0", default-features = false, features = ["vendored", "image"]}
+# lcms2 = "6.0.0"
+libheif-rs = "2.7.0"
+anyhow = "1.0.104"
+# num = "0.4"
+num-derive = "0.4"
+num-traits = "0.2"
+
+[features]
+default = ["full"]
+full = ["full-image-formats", "heif", "avif", "jxl"]
+basic-image-formats = ["image/bmp", "image/gif", "image/jpeg", "image/png", "image/tiff", "image/webp"]
+full-image-formats = ["image/bmp", "image/dds", "image/exr", "image/ff", "image/gif", "image/hdr", "image/ico", "image/jpeg", "image/png", "image/pnm", "image/qoi", "image/tga", "image/tiff", "image/webp"]
+heif = []
+avif = []
+jxl = []

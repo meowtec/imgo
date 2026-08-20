@@ -1,0 +1,35 @@
+---
+import SeoHead from '../components/SeoHead.astro';
+import type { Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description: string;
+  pathname: string;
+  image: string;
+}
+
+const { locale, ...seoProps } = Astro.props;
+const htmlLang = locale === 'en' ? 'en' : 'zh-CN';
+---
+
+<!doctype html>
+<html lang={htmlLang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <meta name="generator" content={Astro.generator} />
+    <SeoHead locale={locale} {...seoProps} noindex />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

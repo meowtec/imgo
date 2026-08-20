@@ -1,0 +1,40 @@
+---
+import Homepage from '../components/Homepage.astro';
+import { getSiteCopy, localeRoutes } from '../i18n';
+import Layout from '../layouts/Layout.astro';
+import '../styles/global.css';
+
+const locale = 'en';
+const copy = getSiteCopy(locale);
+const routes = localeRoutes[locale];
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'IMGo',
+    url: 'https://imgo.app/',
+    applicationCategory: 'MultimediaApplication',
+    operatingSystem: 'Any operating system with a modern web browser',
+    isAccessibleForFree: true,
+    inLanguage: copy.htmlLang,
+    featureList: [
+      'Batch image processing',
+      'Local image processing',
+      'Browser processing with WebAssembly',
+      'Image format conversion',
+    ],
+  },
+];
+---
+
+<Layout
+  locale={locale}
+  title={copy.seo.homeTitle}
+  description={copy.seo.homeDescription}
+  pathname={routes.home}
+  alternatePathname={routes.alternateHome}
+  image="/og/imgo-en.png"
+  {jsonLd}
+>
+  <Homepage {locale} />
+</Layout>

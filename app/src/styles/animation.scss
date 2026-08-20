@@ -1,0 +1,85 @@
+.skeleton-0 {
+  animation: skeleton-loading-0 1s linear infinite alternate;
+}
+
+@keyframes skeleton-loading-0 {
+  0% {
+    background-color: hsl(0, 0%, 90%);
+  }
+  100% {
+    background-color: hsl(0, 0%, 98%);
+  }
+}
+
+.skeleton {
+  background: linear-gradient(135deg, #eee 25%, #fafafa 50%, #eee 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite ease-in-out;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+.slide-modal-enter {
+  opacity: 0;
+  transform: translate3d(0, 60px, 0);
+}
+
+.slide-modal-enter-active {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity 400ms,
+    transform 400ms;
+}
+
+.slide-modal-exit {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.slide-modal-exit-active {
+  opacity: 0;
+  transform: translate3d(0, 60px, 0);
+  transition:
+    opacity 400ms,
+    transform 400ms;
+}
+
+@keyframes listbox-panel-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0) scale3d(0.95, 0.95, 0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+.listbox-panel {
+  animation: listbox-panel-enter 150ms;
+  transform-origin: center 0%;
+}
+
+@keyframes task-empty {
+  from {
+    opacity: 0;
+    transform: scale(1.1);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.task-empty {
+  animation: task-empty ease 0.2s;
+}

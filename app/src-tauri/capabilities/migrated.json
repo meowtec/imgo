@@ -1,0 +1,32 @@
+{
+  "identifier": "migrated",
+  "description": "permissions that were migrated from v1",
+  "local": true,
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "fs:allow-read-file",
+    "fs:allow-write-file",
+    "fs:allow-read-dir",
+    "fs:allow-copy-file",
+    "fs:allow-mkdir",
+    "fs:allow-remove",
+    "fs:allow-remove",
+    "fs:allow-rename",
+    "fs:allow-exists",
+    {
+      "identifier": "fs:scope",
+      "allow": ["$CACHE/**", "$TEMP/**", "$APPCACHE/**", "$DOWNLOAD/**"]
+    },
+    "core:window:allow-create",
+    "dialog:allow-open",
+    "dialog:allow-save",
+    "dialog:allow-message",
+    "dialog:allow-ask",
+    "dialog:allow-confirm",
+    "dialog:default",
+    "fs:default",
+    "dialog:default",
+    "core:event:allow-listen"
+  ]
+}

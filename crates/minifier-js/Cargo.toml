@@ -1,0 +1,16 @@
+[package]
+name = "minifier-js"
+version = "0.1.0"
+edition = "2021"
+build = "build.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rmp-serde = "1.3.1"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_bytes = "0.11.19"
+minifier = { path = "../minifier", default-features = false, features = ["basic-image-formats", "heif", "avif"]}
+num = "0.4"
+num-derive = "0.4"
+num-traits = "0.2"

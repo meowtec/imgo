@@ -1,0 +1,47 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["unicorn", "typescript", "oxc", "import", "react"],
+  "jsPlugins": [
+    {
+      "name": "react-hooks-js",
+      "specifier": "eslint-plugin-react-hooks"
+    }
+  ],
+  "options": {
+    "typeAware": true
+  },
+  "ignorePatterns": [
+    "crates/minifier-js/lib",
+    "crates/minifier-js/wasm",
+    "crates/shared-js/pkg",
+    "app/src/components/ui",
+    "app/src-tauri/bindings"
+  ],
+  "rules": {
+    "typescript/no-explicit-any": "warn",
+    "typescript/restrict-template-expressions": [
+      "error",
+      {
+        "allowNumber": true
+      }
+    ],
+    "import/default": "error",
+    "import/namespace": "error",
+    "react-hooks-js/rules-of-hooks": "error",
+    "react-hooks-js/exhaustive-deps": "warn",
+    "react-hooks-js/config": "error",
+    "react-hooks-js/error-boundaries": "error",
+    "react-hooks-js/gating": "error",
+    "react-hooks-js/globals": "error",
+    "react-hooks-js/immutability": "error",
+    "react-hooks-js/preserve-manual-memoization": "error",
+    "react-hooks-js/purity": "error",
+    "react-hooks-js/refs": "error",
+    "react-hooks-js/set-state-in-effect": "error",
+    "react-hooks-js/set-state-in-render": "error",
+    "react-hooks-js/static-components": "error",
+    "react-hooks-js/unsupported-syntax": "warn",
+    "react-hooks-js/use-memo": "error",
+    "react-hooks-js/incompatible-library": "warn"
+  }
+}

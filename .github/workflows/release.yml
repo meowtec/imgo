@@ -1,0 +1,351 @@
+name: Release desktop
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing vX.Y.Z tag to rebuild
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-release-${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: 24.18.0
+  PNPM_VERSION: 11.17.0
+  RUST_VERSION: 1.97.1
+
+jobs:
+  metadata:
+    name: Validate release metadata
+    runs-on: ubuntu-24.04
+    outputs:
+      checkout-ref: ${{ steps.metadata.outputs.checkout-ref }}
+      tag: ${{ steps.metadata.outputs.tag }}
+      version: ${{ steps.metadata.outputs.version }}
+      prerelease: ${{ steps.metadata.outputs.prerelease }}
+    steps:
+      - name: Resolve tag
+        id: ref
+        shell: bash
+        env:
+          DISPATCH_TAG: ${{ inputs.tag }}
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            tag="$DISPATCH_TAG"
+          else
+            tag="$REF_NAME"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: ${{ steps.ref.outputs.tag }}
+          submodules: recursive
+
+      - name: Apply native source patches
+        run: npm run init:src
+
+      - name: Validate versions
+        id: metadata
+        shell: bash
+        env:
+          TAG: ${{ steps.ref.outputs.tag }}
+        run: |
+          if [[ ! "$TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$ ]]; then
+            echo "Invalid release tag: $TAG" >&2
+            exit 1
+          fi
+
+          version="${TAG#v}"
+          app_version="$(jq -r '.version' app/package.json)"
+          if [[ "$version" == *-* ]]; then
+            prerelease=true
+          else
+            prerelease=false
+          fi
+
+          if [[ "$app_version" != "$version" ]]; then
+            echo "Version mismatch: tag=$version app=$app_version" >&2
+            exit 1
+          fi
+
+          echo "checkout-ref=$TAG" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
+
+  prepare-app:
+    name: Prepare app bindings
+    needs: metadata
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.metadata.outputs.checkout-ref }}
+          submodules: recursive
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          targets: wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: shared-js-${{ hashFiles('deps/*.patch') }}
+          workspaces: . -> target
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-pack@0.15.0
+          fallback: none
+
+      - name: Apply native source patches
+        run: pnpm run init:src
+
+      - name: Build shared JS bindings
+        run: pnpm run rsts
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: shared-js-${{ needs.metadata.outputs.version }}
+          path: crates/shared-js/pkg
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
+
+  build-desktop:
+    name: Build ${{ matrix.os }} ${{ matrix.arch }}
+    needs: [metadata, prepare-app]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: linux
+            arch: x64
+            runner: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            bundle: appimage
+            artifact: target/x86_64-unknown-linux-gnu/release/bundle/appimage/*.AppImage
+          - os: linux
+            arch: arm64
+            runner: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            bundle: appimage
+            artifact: target/aarch64-unknown-linux-gnu/release/bundle/appimage/*.AppImage
+          - os: windows
+            arch: x64
+            runner: windows-2025
+            target: x86_64-pc-windows-msvc
+            bundle: nsis
+            artifact: target/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
+          - os: windows
+            arch: arm64
+            runner: windows-11-arm
+            target: aarch64-pc-windows-msvc
+            bundle: nsis
+            artifact: target/aarch64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
+          - os: macos
+            arch: x64
+            runner: macos-15-intel
+            target: x86_64-apple-darwin
+            bundle: dmg
+            artifact: target/x86_64-apple-darwin/release/bundle/dmg/*.dmg
+          - os: macos
+            arch: arm64
+            runner: macos-15
+            target: aarch64-apple-darwin
+            bundle: dmg
+            artifact: target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.metadata.outputs.checkout-ref }}
+          submodules: recursive
+
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            clang \
+            cmake \
+            file \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libwebkit2gtk-4.1-dev \
+            nasm \
+            ninja-build \
+            patchelf \
+            pkg-config
+
+      - name: Ensure macOS build dependencies
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          brew list cmake >/dev/null 2>&1 || brew install cmake
+          brew list ninja >/dev/null 2>&1 || brew install ninja
+          # libaom's test_nasm() runs `nasm -hf` and greps for -Ox. That check
+          # rejects NASM < 2.14 (no -Ox) and NASM >= 3.0 (its -hf shows topic
+          # help, so the -Ox line no longer appears), so the Homebrew nasm
+          # (3.x) fails the aom build. Build the last compatible release,
+          # 2.16.03, from source (homebrew-core ships only `nasm` at 3.x;
+          # there is no versioned `nasm@2` formula).
+          if [[ "${{ matrix.target }}" == "x86_64-apple-darwin" ]] && ! nasm -v 2>/dev/null | grep -q '^NASM version 2\.'; then
+            curl -fsSL "https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/nasm-2.16.03.tar.gz" -o /tmp/nasm-2.16.03.tar.gz
+            tar -xzf /tmp/nasm-2.16.03.tar.gz -C /tmp
+            cd /tmp/nasm-2.16.03
+            ./configure
+            make -j"$(sysctl -n hw.ncpu)"
+            sudo make install
+            nasm -v
+          fi
+
+      - name: Verify Windows build dependencies
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          cmake --version
+          ninja --version
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}-${{ hashFiles('deps/*.patch') }}
+          workspaces: . -> target
+
+      - name: Apply native source patches
+        run: pnpm run init:src
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: shared-js-${{ needs.metadata.outputs.version }}
+          path: crates/shared-js/pkg
+
+      - name: Install workspace dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build minifier JS wrapper
+        run: pnpm --filter @imgo/minifier-js build
+
+      - name: Build desktop bundle
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: ${{ runner.os == 'Linux' && '1' || '' }}
+          APPLE_SIGNING_IDENTITY: ${{ runner.os == 'macOS' && '-' || '' }}
+        run: pnpm --dir app tauri build --target ${{ matrix.target }} --bundles ${{ matrix.bundle }}
+
+      - name: Find desktop artifact
+        id: artifact
+        shell: bash
+        env:
+          ARTIFACT_GLOB: ${{ matrix.artifact }}
+        run: |
+          shopt -s nullglob
+          files=($ARTIFACT_GLOB)
+          if [[ "${#files[@]}" -ne 1 ]]; then
+            echo "Expected exactly one artifact for $ARTIFACT_GLOB, found ${#files[@]}" >&2
+            printf '%s\n' "${files[@]}" >&2
+            exit 1
+          fi
+          echo "path=${files[0]}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: IMGo-${{ needs.metadata.outputs.version }}-${{ matrix.os }}-${{ matrix.arch }}
+          path: ${{ steps.artifact.outputs.path }}
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish release
+    needs: [metadata, prepare-app, build-desktop]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: IMGo-${{ needs.metadata.outputs.version }}-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Validate release assets
+        shell: bash
+        run: |
+          mapfile -t appimages < <(find release-assets -type f -name '*.AppImage')
+          mapfile -t installers < <(find release-assets -type f -name '*-setup.exe')
+          mapfile -t dmgs < <(find release-assets -type f -name '*.dmg')
+
+          if [[ "${#appimages[@]}" -ne 2 || "${#installers[@]}" -ne 2 || "${#dmgs[@]}" -ne 2 ]]; then
+            echo "Expected 2 AppImages, 2 NSIS installers, and 2 DMGs." >&2
+            find release-assets -type f -print >&2
+            exit 1
+          fi
+
+      - name: Create or update release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.metadata.outputs.tag }}
+          PRERELEASE: ${{ needs.metadata.outputs.prerelease }}
+        run: |
+          mapfile -d '' -t assets < <(
+            find release-assets -type f \
+              \( -name '*.AppImage' -o -name '*-setup.exe' -o -name '*.dmg' \) \
+              -print0
+          )
+
+          if release_json="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" 2>/dev/null)"; then
+            if [[ "$(jq -r '.prerelease' <<< "$release_json")" != "$PRERELEASE" ]]; then
+              echo "Refusing to change the release type for $TAG." >&2
+              exit 1
+            fi
+            gh release upload "$TAG" "${assets[@]}" --clobber
+          else
+            release_args=(
+              --generate-notes
+              --title "IMGo $TAG"
+              --verify-tag
+            )
+            if [[ "$PRERELEASE" == "true" ]]; then
+              release_args+=(--prerelease)
+            else
+              release_args+=(--latest)
+            fi
+            gh release create "$TAG" "${assets[@]}" "${release_args[@]}"
+          fi

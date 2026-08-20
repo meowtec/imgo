@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDevelopmentRegion</key>
+  <string>en</string>
+  <key>CFBundleLocalizations</key>
+  <array>
+    <string>ar</string>
+    <string>de</string>
+    <string>en</string>
+    <string>es</string>
+    <string>fr</string>
+    <string>hr</string>
+    <string>it</string>
+    <string>nl</string>
+    <string>sr</string>
+    <string>sv</string>
+    <string>zh-Hans</string>
+    <string>zh-Hant</string>
+  </array>
+</dict>
+</plist>

@@ -1,0 +1,123 @@
+---
+import { getSiteCopy, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getSiteCopy(locale);
+const { appLabel, loading } = copy.workbench;
+---
+
+<div class="app-window" role="region" aria-label={appLabel}>
+  <div class="app-window__titlebar" aria-hidden="true">
+    <div class="app-window__controls">
+      <span class="app-window__control app-window__control--close"></span>
+      <span class="app-window__control app-window__control--minimize"></span>
+      <span class="app-window__control app-window__control--zoom"></span>
+    </div>
+    <span class="app-window__title">IMGo</span>
+  </div>
+  <div class="app-window__content">
+    <div
+      id="imgo-root"
+      class="app-window__root"
+      data-lazy="true"
+      data-locale={locale}
+      aria-label={appLabel}
+      aria-busy="true"
+    >
+      <span class="app-window__loading">{loading}</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  import '../scripts/mount-app';
+</script>
+
+<style>
+  .app-window {
+    width: min(100%, var(--app-max));
+    margin-inline: auto;
+    overflow: clip;
+    border: var(--rule-hair) solid var(--color-window-rule);
+    border-radius: var(--radius-window);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-window);
+  }
+
+  .app-window__titlebar {
+    position: relative;
+    display: grid;
+    min-height: var(--window-titlebar-height);
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    border-block-end: var(--rule-hair) solid var(--color-window-rule);
+    padding-inline: var(--space-md);
+    background: var(--color-window-bar);
+    user-select: none;
+  }
+
+  .app-window__controls {
+    display: flex;
+    gap: var(--space-xs);
+    justify-self: start;
+  }
+
+  .app-window__control {
+    width: var(--window-control-size);
+    height: var(--window-control-size);
+    border: var(--rule-hair) solid var(--color-window-control-rule);
+    border-radius: var(--radius-round);
+  }
+
+  .app-window__control--close {
+    background: var(--color-window-close);
+  }
+
+  .app-window__control--minimize {
+    background: var(--color-window-minimize);
+  }
+
+  .app-window__control--zoom {
+    background: var(--color-window-zoom);
+  }
+
+  .app-window__title {
+    grid-column: 2;
+    color: var(--color-muted);
+    font-size: var(--text-xs);
+    font-weight: 600;
+  }
+
+  .app-window__content {
+    position: relative;
+    min-width: 0;
+    min-height: var(--window-content-height);
+    overflow: clip;
+    background: var(--color-surface);
+  }
+
+  .app-window__root {
+    position: relative;
+    min-width: 0;
+    min-height: var(--window-content-height);
+  }
+
+  .app-window__loading {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+  }
+
+  @media (max-width: 30rem) {
+    .app-window__titlebar {
+      padding-inline: var(--space-sm);
+    }
+  }
+</style>
