@@ -169,7 +169,7 @@ export function AppHeader({ embedded = false }: AppHeaderProps) {
       </div>
       <div
         className={cn(
-          'imgo-header-stats flex min-w-0 flex-1 items-center border-l border-border/60 pl-4 text-xs',
+          'imgo-header-stats ml-1 flex min-w-0 flex-1 items-center justify-end pl-4 text-xs',
         )}
       >
         <div className="grid min-w-0 w-full max-w-[420px] grid-cols-[max-content_8rem_minmax(0,1fr)] gap-x-3 gap-y-2">

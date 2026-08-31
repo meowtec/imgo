@@ -22,7 +22,13 @@ export function FullScreenModal({
   useLockBody(show && !contained);
 
   return (
-    <CSSTransition nodeRef={nodeRef} in={show} timeout={400} unmountOnExit classNames="slide-modal">
+    <CSSTransition
+      nodeRef={nodeRef}
+      in={show}
+      timeout={{ enter: 250, exit: 150 }}
+      unmountOnExit
+      classNames="slide-modal"
+    >
       <div
         className={cn(
           'z-10 inset-0 bg-background/80 backdrop-blur-xl',

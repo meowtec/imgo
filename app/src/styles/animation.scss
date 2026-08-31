@@ -28,15 +28,15 @@
 
 .slide-modal-enter {
   opacity: 0;
-  transform: translate3d(0, 60px, 0);
+  transform: translate3d(0, 24px, 0);
 }
 
 .slide-modal-enter-active {
   opacity: 1;
   transform: translate3d(0, 0, 0);
   transition:
-    opacity 400ms,
-    transform 400ms;
+    opacity 250ms,
+    transform 250ms;
 }
 
 .slide-modal-exit {
@@ -46,10 +46,10 @@
 
 .slide-modal-exit-active {
   opacity: 0;
-  transform: translate3d(0, 60px, 0);
+  transform: translate3d(0, 12px, 0);
   transition:
-    opacity 400ms,
-    transform 400ms;
+    opacity 150ms,
+    transform 150ms;
 }
 
 @keyframes listbox-panel-enter {
