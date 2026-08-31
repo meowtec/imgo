@@ -18,6 +18,19 @@ function generateI18n() {
     }
   }
 
+  const defaultKeys = Object.keys(record.en);
+  for (const [locale, texts] of Object.entries(record)) {
+    const missingKeys = defaultKeys.filter((key) => !(key in texts));
+    const extraKeys = Object.keys(texts).filter((key) => !(key in record.en));
+    if (missingKeys.length || extraKeys.length) {
+      throw new Error(
+        `${locale}.json keys do not match en.json` +
+          (missingKeys.length ? `; missing: ${missingKeys.join(', ')}` : '') +
+          (extraKeys.length ? `; extra: ${extraKeys.join(', ')}` : ''),
+      );
+    }
+  }
+
   fs.writeFileSync(
     I18N_DIST_DTS,
     dedent`
