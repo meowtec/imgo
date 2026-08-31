@@ -128,7 +128,7 @@ function OptimizeOptionsView({ input, value, onChange }: OptimizeOptionsProps) {
           render={({ field }) => {
             return (
               <FormItem>
-                <FormLabel className="font-normal">{i18n.text('downsize')}</FormLabel>
+                <FormLabel className="font-normal">{i18n.text('resize')}</FormLabel>
                 <FormControl>
                   <ResizeInput value={field.value ?? null} onChange={field.onChange} />
                 </FormControl>

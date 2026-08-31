@@ -390,12 +390,13 @@ function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
                               return (
                                 <FormItem>
                                   <FormLabel className="font-normal">
-                                    {i18n.text('downsize')}
+                                    {i18n.text('resize')}
                                   </FormLabel>
                                   <FormControl>
                                     <ResizeInput
                                       value={field.value ?? null}
                                       onChange={field.onChange}
+                                      triggerClassName="w-[200px]"
                                     />
                                   </FormControl>
                                   <FormMessage />

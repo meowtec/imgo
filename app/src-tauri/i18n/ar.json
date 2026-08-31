@@ -74,7 +74,6 @@
   "delete_conversion_profile": "حذف ملف تعريف التحويل",
   "format": "التنسيق",
   "quality_description": "الجودة الأعلى تنتج صورًا أفضل وملفات أكبر",
-  "downsize": "تقليص الحجم",
   "preserve_exif": "الحفاظ على EXIF",
   "add_conversion_profile": "إضافة ملف تعريف التحويل",
   "skip_oversized": "تخطي حفظ ملفات الإخراج الأكبر حجمًا",

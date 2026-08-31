@@ -74,7 +74,6 @@
   "delete_conversion_profile": "Izbriši profil konverzije",
   "format": "Format",
   "quality_description": "Viša kvaliteta daje bolje slike i veće datoteke",
-  "downsize": "Smanji",
   "preserve_exif": "Sačuvaj EXIF",
   "add_conversion_profile": "Dodajte profil konverzije",
   "skip_oversized": "Preskočite spremanje većih izlaznih datoteka",

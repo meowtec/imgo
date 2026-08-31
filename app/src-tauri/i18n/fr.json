@@ -74,7 +74,6 @@
   "delete_conversion_profile": "Supprimer le profil de conversion",
   "format": "Format",
   "quality_description": "Une qualité supérieure produit de meilleures images et des fichiers plus volumineux",
-  "downsize": "Réduire les effectifs",
   "preserve_exif": "Conserver les EXIF",
   "add_conversion_profile": "Ajouter un profil de conversion",
   "skip_oversized": "Ignorer l'enregistrement des fichiers de sortie plus volumineux",

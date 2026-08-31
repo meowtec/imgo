@@ -74,7 +74,6 @@
   "delete_conversion_profile": "Conversion-Profil löschen",
   "format": "Format",
   "quality_description": "Höhere Qualität führt zu besseren Bildern und größeren Dateien",
-  "downsize": "Verkleinern",
   "preserve_exif": "EXIF beibehalten",
   "add_conversion_profile": "Konvertierungsprofil hinzufügen",
   "skip_oversized": "Überspringen Sie das Speichern größerer Ausgabedateien",

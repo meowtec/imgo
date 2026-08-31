@@ -12,6 +12,7 @@ interface ResizeInputProps {
   value: ResizeOptions | null;
   defaultSize?: Size;
   onChange: (value: ResizeOptions | null) => void;
+  triggerClassName?: string;
 }
 
 type SelectResizeType = ResizeType | 'NONE';
@@ -54,6 +55,7 @@ export function ResizeInput({
   value,
   defaultSize = { width: 360, height: 360 },
   onChange,
+  triggerClassName = 'w-[120px]',
 }: ResizeInputProps) {
   const handleTypeChange = (type: SelectResizeType) => {
     if (type === 'NONE') {
@@ -87,7 +89,7 @@ export function ResizeInput({
   return (
     <div className="flex items-center gap-2">
       <Select<SelectResizeType>
-        triggerClassName="w-[100px]"
+        triggerClassName={triggerClassName}
         value={type}
         onChange={handleTypeChange}
         options={

@@ -74,7 +74,6 @@
   "delete_conversion_profile": "删除转换配置",
   "format": "格式",
   "quality_description": "质量越高，画质越好，体积越大",
-  "downsize": "缩小尺寸",
   "preserve_exif": "保留 EXIF",
   "add_conversion_profile": "添加转换配置",
   "skip_oversized": "生成文件过大时跳过保存",

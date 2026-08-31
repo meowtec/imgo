@@ -74,7 +74,6 @@
   "delete_conversion_profile": "Ta bort konverteringsprofil",
   "format": "Format",
   "quality_description": "Högre kvalitet ger bättre bilder och större filer",
-  "downsize": "Minska",
   "preserve_exif": "Bevara EXIF",
   "add_conversion_profile": "Lägg till konverteringsprofil",
   "skip_oversized": "Hoppa över att spara större utdatafiler",

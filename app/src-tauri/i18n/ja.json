@@ -74,7 +74,6 @@
   "delete_conversion_profile": "変換プロファイルを削除",
   "format": "形式",
   "quality_description": "品質を上げると画質が向上し、ファイルサイズも大きくなります",
-  "downsize": "縮小",
   "preserve_exif": "EXIFを保持",
   "add_conversion_profile": "変換プロファイルを追加",
   "skip_oversized": "出力ファイルが大きい場合は保存しない",
