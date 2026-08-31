@@ -96,7 +96,7 @@ jobs:
           ref: ${{ needs.metadata.outputs.checkout-ref }}
           submodules: recursive
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: ${{ env.PNPM_VERSION }}
 
@@ -229,7 +229,7 @@ jobs:
           cmake --version
           ninja --version
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: ${{ env.PNPM_VERSION }}
 
