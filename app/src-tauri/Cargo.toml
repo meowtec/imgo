@@ -37,6 +37,7 @@ minifier = { path = "../../crates/minifier" }
 minifier-utils = { path = "../../crates/minifier-utils" }
 nanoid = "0.5.0"
 ts-rs = "12.0.1"
+tauri-plugin-single-instance = "2"
 
 [features]
 # by default Tauri runs in production mode

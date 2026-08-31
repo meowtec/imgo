@@ -4,6 +4,8 @@
 
 > [!IMPORTANT]
 > IMGo is the next-generation rewrite of the original [meowtec/Imagine](https://github.com/meowtec/Imagine). It replaces Electron with Tauri for a smaller desktop app, supports more image formats, and adds a full web version that runs directly in your browser.
+>
+> If you prefer the original UI interactions but need support for more formats, consider [Imagine-plus](https://github.com/xianfei/Imagine-plus).
 
 IMGo is a private batch image compression and conversion tool. Process multiple images at once, adjust quality and dimensions, and convert between common formats without uploading your files.
 

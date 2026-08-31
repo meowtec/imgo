@@ -5,8 +5,9 @@
 
 use std::{
   env,
-  path::PathBuf,
-  sync::{Arc, RwLock},
+  ffi::OsString,
+  path::{Path, PathBuf},
+  sync::{Arc, Mutex, RwLock},
 };
 
 use commands::{
@@ -16,7 +17,7 @@ use i18n::I18n;
 use log::{debug, LevelFilter};
 use menu::{create_menu, menu_key};
 use oss::{add_file_to_image, walk_dir_add_images};
-use tauri::{path::BaseDirectory, Emitter, Manager, WindowEvent};
+use tauri::{path::BaseDirectory, AppHandle, Emitter, Manager, Runtime, State, WindowEvent};
 use tauri_plugin_dialog::DialogExt;
 
 mod commands;
@@ -27,12 +28,109 @@ mod oss;
 mod structs;
 mod utils;
 
+#[derive(Default)]
+struct OpenedFilesState {
+  frontend_ready: bool,
+  pending: Vec<PathBuf>,
+}
+
+fn paths_from_args<I, S>(args: I, cwd: &Path) -> Vec<PathBuf>
+where
+  I: IntoIterator<Item = S>,
+  S: Into<OsString>,
+{
+  args
+    .into_iter()
+    .skip(1)
+    .map(|arg| {
+      let path = PathBuf::from(arg.into());
+      if path.is_absolute() {
+        path
+      } else {
+        cwd.join(path)
+      }
+    })
+    .filter(|path| path.exists())
+    .collect()
+}
+
+fn add_paths<R: Runtime, T: Emitter<R>>(emitter: &T, paths: &[PathBuf]) {
+  let id = start_emit_file_add(emitter, paths.len());
+  let mut file_add_process_messager = message::FileAddProgressMessager::new(id.clone(), emitter);
+  let result = paths
+    .iter()
+    .flat_map(|path| {
+      if path.is_dir() {
+        walk_dir_add_images(path, &mut file_add_process_messager)
+      } else {
+        file_add_process_messager.process(path.file_name().unwrap_or_default());
+        match add_file_to_image(path) {
+          Ok(data) => vec![data],
+          Err(err) => {
+            log::error!("prepare image failed: {:?}", err);
+            vec![]
+          }
+        }
+      }
+    })
+    .collect::<Vec<_>>();
+
+  debug!(
+    "add paths: {:?}, to: {:?}",
+    paths, &result
+  );
+  emit_file_add(emitter, id, result);
+}
+
+fn handle_opened_files(app_handle: &AppHandle, paths: Vec<PathBuf>) {
+  let state = app_handle.state::<Mutex<OpenedFilesState>>();
+  let mut state = state.lock().unwrap();
+
+  if !state.frontend_ready {
+    state.pending.extend(paths);
+    return;
+  }
+
+  drop(state);
+  add_paths(app_handle, &paths);
+}
+
+fn show_main_window(app_handle: &AppHandle) {
+  if let Some(window) = app_handle.get_webview_window("main") {
+    window.unminimize().ok();
+    window.show().ok();
+    window.set_focus().ok();
+  }
+}
+
+#[tauri::command]
+fn frontend_ready(app_handle: AppHandle, state: State<Mutex<OpenedFilesState>>) {
+  let mut state = state.lock().unwrap();
+  state.frontend_ready = true;
+  let paths = std::mem::take(&mut state.pending);
+  drop(state);
+
+  if !paths.is_empty() {
+    add_paths(&app_handle, &paths);
+  }
+}
+
 fn main() {
   let i18n = Arc::new(RwLock::new(I18n::new()));
   let i18n_w = i18n.clone();
   // let i18n_r = i18n.clone();
 
-  tauri::Builder::default()
+  let app = tauri::Builder::default()
+    .manage(Mutex::new(OpenedFilesState::default()))
+    .plugin(tauri_plugin_single_instance::init(
+      |app_handle, args, cwd| {
+        let paths = paths_from_args(args, Path::new(&cwd));
+        if !paths.is_empty() {
+          handle_opened_files(app_handle, paths);
+        }
+        show_main_window(app_handle);
+      },
+    ))
     .plugin(tauri_plugin_fs::init())
     .plugin(tauri_plugin_dialog::init())
     .plugin(
@@ -49,7 +147,13 @@ fn main() {
     .setup(move |app| {
       oss::setup(&app.path().resolve("oss", BaseDirectory::AppCache).unwrap());
 
-      debug!("args: {:?}", std::env::args());
+      debug!("args: {:?}", env::args());
+      let cwd = env::current_dir().unwrap_or_default();
+      let paths = paths_from_args(env::args_os(), &cwd);
+      if !paths.is_empty() {
+        handle_opened_files(app.handle(), paths);
+      }
+
       let i18n_resource_path = app.path().resolve("i18n", BaseDirectory::Resource).unwrap();
       let i18n_src_path = PathBuf::from("i18n");
       let mut i18n = i18n_w.write().unwrap();
@@ -106,34 +210,7 @@ fn main() {
           });
       }
       WindowEvent::DragDrop(tauri::DragDropEvent::Drop { paths, .. }) => {
-        let id = start_emit_file_add(window, paths.len());
-        let mut file_add_process_messager =
-          message::FileAddProgressMessager::new(id.clone(), window);
-
-        // 对 paths 进行 flat_map，如果是文件夹则调用 walk_dir_add_images;如果是文件则调用 add_file_to_image. 返回 Vec<ImageObject>
-        let result = paths
-          .iter()
-          .flat_map(|path| {
-            if path.is_dir() {
-              walk_dir_add_images(path, &mut file_add_process_messager)
-            } else {
-              file_add_process_messager.process(path.file_name().unwrap_or_default());
-              match add_file_to_image(path) {
-                Ok(data) => vec![data],
-                Err(err) => {
-                  log::error!("prepare image failed: {:?}", err);
-                  vec![]
-                }
-              }
-            }
-          })
-          .collect::<Vec<_>>();
-
-        debug!(
-          "drop files: {:?}, to: {:?}",
-          paths, &result
-        );
-        emit_file_add(window, id, result);
+        add_paths(window, paths);
       }
       _ => {}
     })
@@ -179,7 +256,24 @@ fn main() {
       commands::clear_all,
       commands::save_files,
       commands::clear_files,
+      frontend_ready,
     ])
-    .run(tauri::generate_context!())
+    .build(tauri::generate_context!())
     .expect("error while running tauri application");
+
+  app.run(|app_handle, event| {
+    #[cfg(target_os = "macos")]
+    if let tauri::RunEvent::Opened { urls } = event {
+      let paths = urls
+        .into_iter()
+        .filter_map(|url| url.to_file_path().ok())
+        .collect::<Vec<_>>();
+
+      if !paths.is_empty() {
+        handle_opened_files(app_handle, paths);
+      }
+
+      show_main_window(app_handle);
+    }
+  });
 }

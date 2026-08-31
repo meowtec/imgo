@@ -4,6 +4,8 @@
 
 > [!IMPORTANT]
 > IMGo 是原版 [meowtec/Imagine](https://github.com/meowtec/Imagine) 的新一代重构版本。桌面端已从 Electron 重构为 Tauri，安装体积更小、支持更多图片格式，并提供可直接在浏览器中使用的完整网页版。
+>
+> 如果你更习惯原版的 UI 交互，但又需要更多格式支持，可以考虑 [Imagine-plus](https://github.com/xianfei/Imagine-plus)。
 
 IMGo 是一款注重隐私的批量图片压缩与格式转换工具。你可以一次处理多张图片，调整画质和尺寸，并在常见图片格式之间转换，全程无需上传文件。
 

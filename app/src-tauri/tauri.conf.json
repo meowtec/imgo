@@ -13,6 +13,15 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
+    "fileAssociations": [
+      {
+        "ext": ["png", "jpg", "jpeg", "gif", "webp", "avif", "heic", "heif", "jxl"],
+        "name": "Image",
+        "description": "Image file",
+        "role": "Editor",
+        "rank": "Alternate"
+      }
+    ],
     "windows": {
       "certificateThumbprint": null,
       "digestAlgorithm": "sha256",
