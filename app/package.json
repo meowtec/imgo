@@ -12,6 +12,7 @@
     "tscheck": "tsc --noEmit",
     "dev": "vite",
     "test": "vitest",
+    "prebuild": "tsx scripts/i18n-gen.ts",
     "build": "tsc && vite build",
     "dev:web": "RUNTIME=web vite",
     "dev:app": "tauri dev",
