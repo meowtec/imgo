@@ -3,7 +3,7 @@ use tauri::{
   App,
 };
 
-use crate::i18n::I18n;
+use crate::{commands::about::create_about_metadata, i18n::I18n};
 
 pub mod menu_key {
   pub const OPEN: &str = "open";
@@ -11,12 +11,11 @@ pub mod menu_key {
   pub const SAVE: &str = "save";
   pub const SAVE_NEW_FILE: &str = "save_new_file";
   pub const SAVE_TO_DIR: &str = "save_to_dir";
-  pub const ABOUT: &str = "about";
 }
 
 pub fn create_menu(app: &App, i18n: &I18n) -> Menu<tauri::Wry> {
   let menu_app = SubmenuBuilder::new(app, "IMGo")
-    .about(None)
+    .about(Some(create_about_metadata(app, i18n)))
     .quit()
     .build()
     .unwrap();

@@ -18,7 +18,7 @@ use log::{debug, LevelFilter};
 use menu::{create_menu, menu_key};
 use oss::{add_file_to_image, walk_dir_add_images};
 use tauri::{path::BaseDirectory, AppHandle, Emitter, Manager, Runtime, State, WindowEvent};
-use tauri_plugin_dialog::DialogExt;
+use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 
 mod commands;
 mod i18n;
@@ -118,7 +118,7 @@ fn frontend_ready(app_handle: AppHandle, state: State<Mutex<OpenedFilesState>>) 
 fn main() {
   let i18n = Arc::new(RwLock::new(I18n::new()));
   let i18n_w = i18n.clone();
-  // let i18n_r = i18n.clone();
+  let i18n_r = i18n.clone();
 
   let app = tauri::Builder::default()
     .manage(Mutex::new(OpenedFilesState::default()))
@@ -195,17 +195,31 @@ fn main() {
     .on_window_event(move |window, event| match event {
       WindowEvent::CloseRequested { api, .. } => {
         api.prevent_close();
-        let win = window.clone();
+        let (title, message, confirm_text, cancel_text) = {
+          let i18n = i18n_r.read().unwrap();
+          (
+            i18n.text("conform_exit").to_string(),
+            i18n.text("conform_exit_explain").to_string(),
+            i18n.text("confirm").to_string(),
+            i18n.text("cancel").to_string(),
+          )
+        };
+        let window = window.clone();
+
         window
-          .app_handle()
           .dialog()
-          .message("Close?")
-          .kind(tauri_plugin_dialog::MessageDialogKind::Info)
-          .buttons(tauri_plugin_dialog::MessageDialogButtons::YesNo)
+          .message(message)
+          .title(title)
+          .kind(MessageDialogKind::Warning)
+          .buttons(MessageDialogButtons::OkCancelCustom(
+            confirm_text,
+            cancel_text,
+          ))
+          .parent(&window)
           .show(move |confirmed| {
             if confirmed {
               oss::clear_all();
-              win.destroy().ok();
+              window.destroy().expect("destroy main window");
             }
           });
       }
@@ -219,9 +233,6 @@ fn main() {
       let app_handle_cloned = app_handle.clone();
 
       match menu_id.0.as_ref() {
-        menu_key::ABOUT => {
-          // show_about_dialog(&win, &i18n_r.read().unwrap());
-        }
         menu_key::OPEN => {
           pick_files(app_handle_cloned);
         }
