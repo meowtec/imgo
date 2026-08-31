@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - main
+      - develop
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -49,23 +51,22 @@ jobs:
           toolchain: ${{ env.RUST_VERSION }}
           targets: wasm32-unknown-unknown,wasm32-unknown-emscripten
 
+      - name: Apply native source patches
+        run: pnpm run init:src
+
       - uses: Swatinem/rust-cache@v2
         with:
           key: ci-emsdk-${{ env.EMSDK_VERSION }}-${{ hashFiles('deps/*.patch') }}
-          workspaces: . -> target
+          cache-targets: false
 
       - uses: taiki-e/install-action@v2
         with:
           tool: wasm-pack@0.15.0
           fallback: none
 
-      - uses: mymindstorm/setup-emsdk@v14
+      - uses: emscripten-core/setup-emsdk@v16
         with:
           version: ${{ env.EMSDK_VERSION }}
-          actions-cache-folder: emsdk-cache
-
-      - name: Apply native source patches
-        run: pnpm run init:src
 
       - name: Build shared JS bindings
         run: pnpm run rsts

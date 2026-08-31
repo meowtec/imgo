@@ -109,6 +109,9 @@ jobs:
           toolchain: ${{ env.RUST_VERSION }}
           targets: wasm32-unknown-unknown
 
+      - name: Apply native source patches
+        run: pnpm run init:src
+
       - uses: Swatinem/rust-cache@v2
         with:
           key: shared-js-${{ hashFiles('deps/*.patch') }}
@@ -118,9 +121,6 @@ jobs:
         with:
           tool: wasm-pack@0.15.0
           fallback: none
-
-      - name: Apply native source patches
-        run: pnpm run init:src
 
       - name: Build shared JS bindings
         run: pnpm run rsts
@@ -244,13 +244,13 @@ jobs:
           toolchain: ${{ env.RUST_VERSION }}
           targets: ${{ matrix.target }}
 
+      - name: Apply native source patches
+        run: pnpm run init:src
+
       - uses: Swatinem/rust-cache@v2
         with:
           key: ${{ matrix.target }}-${{ hashFiles('deps/*.patch') }}
           workspaces: . -> target
-
-      - name: Apply native source patches
-        run: pnpm run init:src
 
       - uses: actions/download-artifact@v8
         with:
