@@ -20,7 +20,7 @@ const initialState: StoreState = {
     globalDefaultOptions: [
       {
         inputFormats: [ALL_FORMAT],
-        outputFormat: 'AVIF', // 'self',
+        outputFormat: 'WEBP',
         options: {
           indexed: false,
           quality: 70,
