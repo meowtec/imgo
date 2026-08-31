@@ -1,0 +1,47 @@
+---
+import Homepage from '../../components/Homepage.astro';
+import {
+  getSiteCopy,
+  localeConfig,
+  localeRoutes,
+  locales,
+  type Locale,
+} from '../../i18n';
+import Layout from '../../layouts/Layout.astro';
+import '../../styles/global.css';
+
+export function getStaticPaths() {
+  return locales
+    .filter((locale) => locale !== 'en')
+    .map((locale) => ({ params: { locale }, props: { locale } }));
+}
+
+const { locale } = Astro.props as { locale: Locale };
+const copy = getSiteCopy(locale);
+const routes = localeRoutes[locale];
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'IMGo',
+    url: new URL(routes.home, Astro.site ?? 'https://imgo.app').href,
+    applicationCategory: 'MultimediaApplication',
+    operatingSystem: 'Any operating system with a modern web browser',
+    isAccessibleForFree: true,
+    inLanguage: localeConfig[locale].htmlLang,
+    featureList: copy.hero.proof,
+  },
+];
+---
+
+<Layout
+  {locale}
+  title={copy.seo.homeTitle}
+  description={copy.seo.homeDescription}
+  pathname={routes.home}
+  page="home"
+  image={locale === 'zh' ? '/og/imgo-zh.png' : '/og/imgo-en.png'}
+  {jsonLd}
+>
+  <Homepage {locale} />
+</Layout>

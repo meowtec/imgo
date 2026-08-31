@@ -1,6 +1,6 @@
 ---
 import type { Locale } from '../i18n';
-import { getSiteCopy, localeRoutes } from '../i18n';
+import { getSiteCopy } from '../i18n';
 import Button from './Button.astro';
 import Header from './Header.astro';
 import WebApp from './WebApp.astro';
@@ -11,7 +11,6 @@ interface Props {
 
 const { locale } = Astro.props;
 const copy = getSiteCopy(locale);
-const routes = localeRoutes[locale];
 const downloadUrl = 'https://github.com/meowtec/imgo/releases';
 const githubUrl = 'https://github.com/meowtec/imgo';
 ---
@@ -72,9 +71,6 @@ const githubUrl = 'https://github.com/meowtec/imgo';
       <nav aria-label={copy.footer.navigationLabel}>
         <a href={githubUrl}>{copy.footer.github}</a>
         <a href={downloadUrl}>{copy.footer.download}</a>
-        <a href={routes.alternateHome} lang={locale === 'en' ? 'zh-CN' : 'en'}>
-          {copy.footer.alternateLanguage}
-        </a>
       </nav>
       <span>© {new Date().getFullYear()} · {copy.footer.copyright}</span>
     </div>

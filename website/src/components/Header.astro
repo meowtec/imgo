@@ -23,8 +23,7 @@ const routes = localeRoutes[locale];
     <LanguageMenu
       {locale}
       label={copy.nav.languageLabel}
-      currentHref={routes.home}
-      alternateHref={routes.alternateHome}
+      page="home"
     />
     <a class="nav-action" href={appHref ?? routes.app}>{copy.nav.openApp}</a>
   </nav>

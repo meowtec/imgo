@@ -1,20 +1,26 @@
 ---
 import AppShellLayout from '../../../layouts/AppShellLayout.astro';
-import { getSiteCopy, localeRoutes } from '../../../i18n';
+import { getSiteCopy, localeRoutes, locales, type Locale } from '../../../i18n';
 import '../../../../tokens.css';
 import '../../../../../app/src/styles/base.css';
 
-const locale = 'zh';
+export function getStaticPaths() {
+  return locales
+    .filter((locale) => locale !== 'en')
+    .map((locale) => ({ params: { locale }, props: { locale } }));
+}
+
+const { locale } = Astro.props as { locale: Locale };
 const copy = getSiteCopy(locale);
 const routes = localeRoutes[locale];
 ---
 
 <AppShellLayout
-  locale={locale}
+  {locale}
   title={copy.seo.appTitle}
   description={copy.seo.appDescription}
   pathname={routes.app}
-  image="/og/imgo-zh.png"
+  image={locale === 'zh' ? '/og/imgo-zh.png' : '/og/imgo-en.png'}
 >
   <div class="online-shell">
     <div

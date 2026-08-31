@@ -1,6 +1,6 @@
 ---
 import SeoHead from '../components/SeoHead.astro';
-import type { Locale } from '../i18n';
+import { localeConfig, type Locale } from '../i18n';
 
 interface Props {
   locale: Locale;
@@ -11,11 +11,11 @@ interface Props {
 }
 
 const { locale, ...seoProps } = Astro.props;
-const htmlLang = locale === 'en' ? 'en' : 'zh-CN';
+const { htmlLang, direction } = localeConfig[locale];
 ---
 
 <!doctype html>
-<html lang={htmlLang}>
+<html lang={htmlLang} dir={direction}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -27,7 +27,7 @@ const htmlLang = locale === 'en' ? 'en' : 'zh-CN';
       rel="stylesheet"
     />
     <meta name="generator" content={Astro.generator} />
-    <SeoHead locale={locale} {...seoProps} noindex />
+    <SeoHead locale={locale} page="app" {...seoProps} noindex />
   </head>
   <body>
     <slot />

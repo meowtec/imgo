@@ -1,6 +1,6 @@
 ---
 import Homepage from '../components/Homepage.astro';
-import { getSiteCopy, localeRoutes } from '../i18n';
+import { getSiteCopy, localeConfig, localeRoutes } from '../i18n';
 import Layout from '../layouts/Layout.astro';
 import '../styles/global.css';
 
@@ -16,7 +16,7 @@ const jsonLd = [
     applicationCategory: 'MultimediaApplication',
     operatingSystem: 'Any operating system with a modern web browser',
     isAccessibleForFree: true,
-    inLanguage: copy.htmlLang,
+    inLanguage: localeConfig[locale].htmlLang,
     featureList: [
       'Batch image processing',
       'Local image processing',
@@ -32,7 +32,7 @@ const jsonLd = [
   title={copy.seo.homeTitle}
   description={copy.seo.homeDescription}
   pathname={routes.home}
-  alternatePathname={routes.alternateHome}
+  page="home"
   image="/og/imgo-en.png"
   {jsonLd}
 >

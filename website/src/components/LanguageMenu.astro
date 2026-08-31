@@ -1,17 +1,14 @@
 ---
 import { Icon } from 'astro-icon/components';
-import type { Locale } from '../i18n';
+import { localeConfig, localeRoutes, locales, type Locale, type Page } from '../i18n';
 
 interface Props {
   locale: Locale;
   label: string;
-  currentHref: string;
-  alternateHref: string;
+  page: Page;
 }
 
-const { locale, label, currentHref, alternateHref } = Astro.props;
-const enHref = locale === 'en' ? currentHref : alternateHref;
-const zhHref = locale === 'zh' ? currentHref : alternateHref;
+const { locale, label, page } = Astro.props;
 ---
 
 <details class="language-menu">
@@ -19,8 +16,18 @@ const zhHref = locale === 'zh' ? currentHref : alternateHref;
     <Icon name="mdi:translate" aria-hidden="true" />
   </summary>
   <div class="language-menu__panel">
-    <a href={enHref} lang="en" aria-current={locale === 'en' ? 'page' : undefined}>English</a>
-    <a href={zhHref} lang="zh-CN" aria-current={locale === 'zh' ? 'page' : undefined}>中文</a>
+    {
+      locales.map((item) => (
+        <a
+          href={localeRoutes[item][page]}
+          lang={localeConfig[item].htmlLang}
+          dir={localeConfig[item].direction}
+          aria-current={locale === item ? 'page' : undefined}
+        >
+          {localeConfig[item].name}
+        </a>
+      ))
+    }
   </div>
 </details>
 
@@ -75,11 +82,13 @@ const zhHref = locale === 'zh' ? currentHref : alternateHref;
     z-index: var(--z-popover);
     display: grid;
     min-width: 9rem;
+    max-height: min(70vh, 30rem);
     padding: var(--space-xs);
     border: var(--rule-hair) solid var(--color-rule);
     border-radius: var(--radius-card);
     background: var(--color-surface);
     box-shadow: var(--shadow-menu);
+    overflow-y: auto;
   }
 
   .language-menu__panel a {

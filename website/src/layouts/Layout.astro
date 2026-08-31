@@ -1,24 +1,24 @@
 ---
 import SeoHead from '../components/SeoHead.astro';
-import type { Locale } from '../i18n';
+import { localeConfig, type Locale, type Page } from '../i18n';
 
 interface Props {
   locale: Locale;
   title: string;
   description: string;
   pathname: string;
-  alternatePathname?: string;
+  page: Page;
   image: string;
   noindex?: boolean;
   jsonLd?: Array<Record<string, unknown>>;
 }
 
 const { locale, ...seoProps } = Astro.props;
-const htmlLang = locale === 'en' ? 'en' : 'zh-CN';
+const { htmlLang, direction } = localeConfig[locale];
 ---
 
 <!doctype html>
-<html lang={htmlLang}>
+<html lang={htmlLang} dir={direction}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
