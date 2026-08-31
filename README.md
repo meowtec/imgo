@@ -7,7 +7,7 @@
 >
 > If you prefer the original UI interactions but need support for more formats, consider [Imagine-plus](https://github.com/xianfei/Imagine-plus).
 
-IMGo is a private batch image compression and conversion tool. Process multiple images at once, adjust quality and dimensions, and convert between common formats without uploading your files.
+IMGo (short for "image optimizer") is a private batch image compression and conversion tool. Process multiple images at once, adjust quality and dimensions, and convert between common formats without uploading your files.
 
 ![IMGo batch processing view](./docs/images/imgo.webp)
 
