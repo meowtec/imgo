@@ -19,12 +19,12 @@ function getDragHint() {
 function TaskListEmpty({ embedded = false }: TaskListProps) {
   return (
     <div
-      className="flex items-center justify-center text-2xl text-foreground/20 select-none task-empty"
+      className="flex items-center justify-center px-[5%] text-2xl text-foreground/20 select-none"
       css={{
         height: embedded ? 'min(60vh, 640px)' : `calc(100vh - ${HEADER_HEIGHT * 2}px)`,
       }}
     >
-      {getDragHint()}
+      <span className="task-empty text-center">{getDragHint()}</span>
     </div>
   );
 }

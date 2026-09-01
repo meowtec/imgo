@@ -44,8 +44,8 @@ export function TaskCardSizeIndicator({
         {outputSize == null ? '  ' : Math.round(Math.abs(1 - compressRate) * 100)}%
       </span>
 
-      <div className="relative min-w-0 flex-1 overflow-hidden rounded text-right">
-        <span className="relative z-10 flex items-center justify-end gap-1 truncate rounded px-1 text-muted-foreground">
+      <div className="relative min-w-0 flex-1 text-right">
+        <span className="relative z-10 flex items-center justify-end gap-1 truncate px-1 text-muted-foreground">
           {sizeFormatter(inputSize)}
           <HiMiniArrowLongRight className="shrink-0" />
           {outputSize == null ? '-' : sizeFormatter(outputSize)}

@@ -177,7 +177,7 @@ export const OptimizeOptionsCard = memo(function OptimizeOptionsCard({
 
   return (
     <div
-      className="fixed left-4 bottom-4 shadow rounded px-4 bg-card"
+      className="fixed left-4 bottom-4 shadow rounded-md px-4 bg-card"
       css={{
         width: 320,
       }}
