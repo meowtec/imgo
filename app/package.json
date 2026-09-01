@@ -2,7 +2,7 @@
   "name": "@imgo/app",
   "private": true,
   "type": "module",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "description": "imgo app",
   "author": "meowtec<bertonzh@gmail.com>",
   "exports": {
