@@ -24,6 +24,7 @@ import { getSimplifiedQualityOptions, LOSSLESS_QUALITY } from '@/constants/simpl
 import { simplifyQuality, unsimplifyQuality } from '@/lib/simplified-quality';
 import { supportsLossless } from '@/constants/format';
 import { i18n } from '@/lib/i18n';
+import { shouldSkipBatchSave } from '@/lib/should-skip-batch-save';
 import { Button } from '../ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { TooltipIconButton } from '../ui/tooltip-icon-button';
@@ -132,6 +133,7 @@ export const TaskCard = memo(function TaskCard({ task }: TaskCardProps) {
 
   const status: keyof typeof TaskStatusDisplayMap =
     isTaskResultComplete(result) && result.saved ? 'saved' : (result?.status ?? '');
+  const skipBatchSave = useStore((state) => shouldSkipBatchSave(task, state.appOptions));
   const statusDisplay = TaskStatusDisplayMap[status];
   const isActive = activeTaskId === task.id;
   const showProcessingSkeleton = status === 'processing';
@@ -252,8 +254,7 @@ export const TaskCard = memo(function TaskCard({ task }: TaskCardProps) {
               outputSize={
                 isTaskResultComplete(result) ? bigintToNumber(result.result.file.size) : null
               }
-              inputFormat={task.input.format}
-              outputFormat={task.outputFormat}
+              skipBatchSave={skipBatchSave}
             >
               {status === 'completed' || status === 'saved' ? (
                 <Button

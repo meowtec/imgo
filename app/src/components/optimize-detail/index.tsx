@@ -2,6 +2,7 @@ import { useRef, useState, useMemo, useEffect, type SetStateAction } from 'react
 import { useMeasure } from 'react-use';
 import { mergeRefs } from 'react-merge-refs';
 import { LiaSortSolid } from 'react-icons/lia';
+import { HiMiniArrowLongRight } from 'react-icons/hi2';
 import { keyframes, type CSSObject } from '@emotion/react';
 import { selectActiveTask, mutations, useStore } from '@/store';
 import { clamp, cn, resizeContain, isTaskResultComplete } from '@/lib/utils';
@@ -337,10 +338,10 @@ export function OptimizeDetail({ task }: OptimizeDetailProps) {
           </div>
         ) : null}
 
-        <div className="absolute right-2 bottom-2 z-100">
-          {task.result?.status === 'completed' ? sizeFormatter(task.result.result.file.size) : '-'}
-          {' / '}
+        <div className="absolute right-2 bottom-2 z-100 flex items-center gap-1">
           {sizeFormatter(task.input.file.size)}
+          <HiMiniArrowLongRight className="shrink-0" />
+          {task.result?.status === 'completed' ? sizeFormatter(task.result.result.file.size) : '-'}
         </div>
       </div>
 

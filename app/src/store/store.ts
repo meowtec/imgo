@@ -15,7 +15,7 @@ const initialState: StoreState = {
   },
   tasks: [],
   appOptions: {
-    skipSaveType: 'SAME_FORMAT',
+    skipSaveType: 'NONE',
     skipSaveMinRatio: DEFAULT_SKIP_SAVE_MIN_RATIO,
     globalDefaultOptions: [
       {

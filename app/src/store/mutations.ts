@@ -14,10 +14,11 @@ import {
 } from '@/types';
 import { taskCluster } from '@/lib/cluster';
 import { isTaskResultComplete } from '@/lib/utils';
-import { removeNulls, updateArrayItem } from '@/lib/array';
+import { updateArrayItem } from '@/lib/array';
 import { cachedOptimize } from '@/lib/services/optimize';
 import { ITEM_INNER_HEIGHT } from '@/constants/layout';
 import { i18n } from '@/lib/i18n';
+import { shouldSkipBatchSave } from '@/lib/should-skip-batch-save';
 import { idRelations, useStore } from './store';
 import { selectPendingTask } from './selectors';
 
@@ -60,6 +61,13 @@ function getDefaultOptions(
       quality: 75,
     },
   };
+}
+
+function getSaveDescription(savedCount: number, skippedCount: number) {
+  const savedDescription = i18n.textTpl('images_saved', [String(savedCount)]);
+  return skippedCount > 0
+    ? `${savedDescription} · ${i18n.textTpl('images_skipped', [String(skippedCount)])}`
+    : savedDescription;
 }
 
 function updateTaskItem(
@@ -291,7 +299,7 @@ export const mutations = {
     mutations.batchPickRunTask(0);
   },
 
-  async saveImages(type: SaveFilesTriggerType, images: ImageObject[]) {
+  async saveImages(type: SaveFilesTriggerType, images: ImageObject[], skippedCount = 0) {
     if (images.length === 0) {
       return;
     }
@@ -327,23 +335,35 @@ export const mutations = {
       });
     } else {
       toast(i18n.text('save_success'), {
-        description: i18n.textTpl('images_saved', [String(savedIds.length)]),
+        description: getSaveDescription(savedIds.length, skippedCount),
       });
     }
   },
 
   saveCompleted(type: SaveFilesTriggerType) {
-    const completeImages = removeNulls(
-      useStore.getState().tasks.map((item) => {
-        if (isTaskResultComplete(item.result)) {
-          return item.result.result;
-        }
+    const { appOptions, tasks } = useStore.getState();
+    const completeImages: ImageObject[] = [];
+    let completedCount = 0;
 
-        return null;
-      }),
-    );
+    tasks.forEach((task) => {
+      if (!isTaskResultComplete(task.result)) return;
 
-    void mutations.saveImages(type, completeImages);
+      completedCount += 1;
+      if (!shouldSkipBatchSave(task, appOptions)) {
+        completeImages.push(task.result.result);
+      }
+    });
+
+    const skippedCount = completedCount - completeImages.length;
+
+    if (skippedCount > 0 && completeImages.length === 0) {
+      toast('', {
+        description: getSaveDescription(0, skippedCount),
+      });
+      return;
+    }
+
+    void mutations.saveImages(type, completeImages, skippedCount);
   },
 };
 
