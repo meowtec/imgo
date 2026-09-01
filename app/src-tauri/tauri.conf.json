@@ -37,12 +37,7 @@
       "infoPlist": "Info.plist"
     },
     "resources": ["i18n"],
-    "shortDescription": "",
-    "linux": {
-      "deb": {
-        "depends": []
-      }
-    }
+    "shortDescription": ""
   },
   "build": {
     "beforeBuildCommand": "npm run build",

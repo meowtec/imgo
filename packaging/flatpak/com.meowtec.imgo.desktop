@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=IMGo
+Comment=Compress and convert images locally
+Exec=IMGo %F
+Icon=com.meowtec.imgo
+Terminal=false
+Type=Application
+Categories=Graphics;
+MimeType=image/png;image/jpeg;image/gif;image/webp;image/avif;image/heic;image/heif;image/jxl;

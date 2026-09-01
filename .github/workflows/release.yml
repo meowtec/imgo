@@ -144,37 +144,53 @@ jobs:
             arch: x64
             runner: ubuntu-24.04
             target: x86_64-unknown-linux-gnu
-            bundle: appimage
-            artifact: target/x86_64-unknown-linux-gnu/release/bundle/appimage/*.AppImage
+            package_arch: amd64
+            bundle: deb,rpm,appimage
+            expected_artifacts: 4
+            artifact: |
+              target/x86_64-unknown-linux-gnu/release/bundle/deb/*.deb
+              target/x86_64-unknown-linux-gnu/release/bundle/rpm/*.rpm
+              target/x86_64-unknown-linux-gnu/release/bundle/appimage/*.AppImage
+              target/x86_64-unknown-linux-gnu/release/bundle/flatpak/*.flatpak
           - os: linux
             arch: arm64
             runner: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
-            bundle: appimage
-            artifact: target/aarch64-unknown-linux-gnu/release/bundle/appimage/*.AppImage
+            package_arch: arm64
+            bundle: deb,rpm,appimage
+            expected_artifacts: 4
+            artifact: |
+              target/aarch64-unknown-linux-gnu/release/bundle/deb/*.deb
+              target/aarch64-unknown-linux-gnu/release/bundle/rpm/*.rpm
+              target/aarch64-unknown-linux-gnu/release/bundle/appimage/*.AppImage
+              target/aarch64-unknown-linux-gnu/release/bundle/flatpak/*.flatpak
           - os: windows
             arch: x64
             runner: windows-2025
             target: x86_64-pc-windows-msvc
             bundle: nsis
+            expected_artifacts: 1
             artifact: target/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
           - os: windows
             arch: arm64
             runner: windows-11-arm
             target: aarch64-pc-windows-msvc
             bundle: nsis
+            expected_artifacts: 1
             artifact: target/aarch64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
           - os: macos
             arch: x64
             runner: macos-15-intel
             target: x86_64-apple-darwin
             bundle: dmg
+            expected_artifacts: 1
             artifact: target/x86_64-apple-darwin/release/bundle/dmg/*.dmg
           - os: macos
             arch: arm64
             runner: macos-15
             target: aarch64-apple-darwin
             bundle: dmg
+            expected_artifacts: 1
             artifact: target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
     runs-on: ${{ matrix.runner }}
     steps:
@@ -192,13 +208,22 @@ jobs:
             clang \
             cmake \
             file \
+            flatpak \
+            flatpak-builder \
             libayatana-appindicator3-dev \
             librsvg2-dev \
             libwebkit2gtk-4.1-dev \
             nasm \
             ninja-build \
             patchelf \
-            pkg-config
+            pkg-config \
+            rpm
+
+          flatpak remote-add --user --if-not-exists flathub \
+            https://dl.flathub.org/repo/flathub.flatpakrepo
+          flatpak install --user -y flathub \
+            org.gnome.Platform//49 \
+            org.gnome.Sdk//49
 
       - name: Ensure macOS build dependencies
         if: runner.os == 'macOS'
@@ -269,25 +294,62 @@ jobs:
           APPLE_SIGNING_IDENTITY: ${{ runner.os == 'macOS' && '-' || '' }}
         run: pnpm --dir app tauri build --target ${{ matrix.target }} --bundles ${{ matrix.bundle }}
 
-      - name: Find desktop artifact
-        id: artifact
+      - name: Build Flatpak bundle
+        if: runner.os == 'Linux'
         shell: bash
         env:
-          ARTIFACT_GLOB: ${{ matrix.artifact }}
+          PACKAGE_ARCH: ${{ matrix.package_arch }}
+          TARGET: ${{ matrix.target }}
+          VERSION: ${{ needs.metadata.outputs.version }}
+        run: |
+          staging="packaging/flatpak/.build"
+          bundle_dir="target/$TARGET/release/bundle/flatpak"
+
+          rm -rf "$staging" flatpak-build flatpak-repo
+          mkdir -p "$staging" "$bundle_dir"
+          install -m755 "target/$TARGET/release/IMGo" "$staging/IMGo"
+          install -m644 app/src-tauri/icons/icon.png "$staging/icon.png"
+          install -m644 packaging/flatpak/com.meowtec.imgo.desktop "$staging/"
+          install -m644 packaging/flatpak/com.meowtec.imgo.metainfo.xml "$staging/"
+          cp -R app/src-tauri/i18n "$staging/i18n"
+
+          flatpak-builder \
+            --user \
+            --force-clean \
+            --disable-rofiles-fuse \
+            --default-branch=stable \
+            --repo=flatpak-repo \
+            flatpak-build \
+            packaging/flatpak/com.meowtec.imgo.yml
+          flatpak build-bundle \
+            flatpak-repo \
+            "$bundle_dir/IMGo_${VERSION}_${PACKAGE_ARCH}.flatpak" \
+            com.meowtec.imgo \
+            stable
+
+      - name: Validate desktop artifacts
+        shell: bash
+        env:
+          ARTIFACT_GLOBS: ${{ matrix.artifact }}
+          EXPECTED_ARTIFACTS: ${{ matrix.expected_artifacts }}
         run: |
           shopt -s nullglob
-          files=($ARTIFACT_GLOB)
-          if [[ "${#files[@]}" -ne 1 ]]; then
-            echo "Expected exactly one artifact for $ARTIFACT_GLOB, found ${#files[@]}" >&2
+          files=()
+          while IFS= read -r pattern; do
+            mapfile -t matches < <(compgen -G "$pattern" || true)
+            files+=("${matches[@]}")
+          done <<< "$ARTIFACT_GLOBS"
+
+          if [[ "${#files[@]}" -ne "$EXPECTED_ARTIFACTS" ]]; then
+            echo "Expected $EXPECTED_ARTIFACTS desktop artifacts, found ${#files[@]}" >&2
             printf '%s\n' "${files[@]}" >&2
             exit 1
           fi
-          echo "path=${files[0]}" >> "$GITHUB_OUTPUT"
 
       - uses: actions/upload-artifact@v7
         with:
           name: IMGo-${{ needs.metadata.outputs.version }}-${{ matrix.os }}-${{ matrix.arch }}
-          path: ${{ steps.artifact.outputs.path }}
+          path: ${{ matrix.artifact }}
           if-no-files-found: error
           retention-days: 7
 
@@ -307,12 +369,15 @@ jobs:
       - name: Validate release assets
         shell: bash
         run: |
+          mapfile -t debs < <(find release-assets -type f -name '*.deb')
+          mapfile -t rpms < <(find release-assets -type f -name '*.rpm')
           mapfile -t appimages < <(find release-assets -type f -name '*.AppImage')
+          mapfile -t flatpaks < <(find release-assets -type f -name '*.flatpak')
           mapfile -t installers < <(find release-assets -type f -name '*-setup.exe')
           mapfile -t dmgs < <(find release-assets -type f -name '*.dmg')
 
-          if [[ "${#appimages[@]}" -ne 2 || "${#installers[@]}" -ne 2 || "${#dmgs[@]}" -ne 2 ]]; then
-            echo "Expected 2 AppImages, 2 NSIS installers, and 2 DMGs." >&2
+          if [[ "${#debs[@]}" -ne 2 || "${#rpms[@]}" -ne 2 || "${#appimages[@]}" -ne 2 || "${#flatpaks[@]}" -ne 2 || "${#installers[@]}" -ne 2 || "${#dmgs[@]}" -ne 2 ]]; then
+            echo "Expected 2 DEBs, 2 RPMs, 2 AppImages, 2 Flatpaks, 2 NSIS installers, and 2 DMGs." >&2
             find release-assets -type f -print >&2
             exit 1
           fi
@@ -327,7 +392,7 @@ jobs:
         run: |
           mapfile -d '' -t assets < <(
             find release-assets -type f \
-              \( -name '*.AppImage' -o -name '*-setup.exe' -o -name '*.dmg' \) \
+              \( -name '*.deb' -o -name '*.rpm' -o -name '*.AppImage' -o -name '*.flatpak' -o -name '*-setup.exe' -o -name '*.dmg' \) \
               -print0
           )
 

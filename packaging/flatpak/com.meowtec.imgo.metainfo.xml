@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.meowtec.imgo</id>
+  <name>IMGo</name>
+  <summary>Compress and convert images locally</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>LicenseRef-proprietary</project_license>
+  <description>
+    <p>
+      IMGo is a batch image compression and conversion tool. Process images,
+      adjust quality and dimensions, and convert formats without uploading
+      files.
+    </p>
+  </description>
+  <launchable type="desktop-id">com.meowtec.imgo.desktop</launchable>
+  <url type="homepage">https://imgo.app/</url>
+  <url type="bugtracker">https://github.com/meowtec/imgo/issues</url>
+  <content_rating type="oars-1.1"/>
+</component>
