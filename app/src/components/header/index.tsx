@@ -1,7 +1,6 @@
 import {
   HiAdjustmentsHorizontal,
   HiOutlineTrash,
-  HiCheck,
   HiOutlineFolderPlus,
   HiOutlineDocumentPlus,
 } from 'react-icons/hi2';
@@ -52,14 +51,8 @@ export function AppHeader({ embedded = false }: AppHeaderProps) {
   const savedSize = Math.max(totalSizeSum - optimizedSizeSum, 0);
   const savedRatio = totalSizeSum > 0 ? savedSize / totalSizeSum : 0;
   const volumeRatio = totalSizeSum > 0 ? Math.min(optimizedSizeSum / totalSizeSum, 1) : 0;
-  const headerStatus =
-    totalCount === 0
-      ? i18n.text('waiting')
-      : completedCount === totalCount
-        ? i18n.text('completed')
-        : i18n.text('processing');
   const summaryBadgeClass =
-    'inline-flex h-5 w-22 shrink-0 items-center justify-center gap-1 rounded-full px-1.5 py-0.5 text-[11px] font-medium';
+    'inline-flex h-5 w-12 shrink-0 items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-medium';
 
   return (
     <header
@@ -67,7 +60,7 @@ export function AppHeader({ embedded = false }: AppHeaderProps) {
         'z-10 flex items-center justify-between gap-2 bg-white px-4 py-2',
         embedded
           ? 'imgo-embedded-header w-full flex-nowrap border-b'
-          : 'fixed left-0 top-0 w-full shadow',
+          : 'fixed left-0 top-0 w-full border-b border-border/80 shadow-[0_1px_2px_rgb(15_23_42_/_0.04)]',
       )}
       css={{
         height: embedded ? 64 : HEADER_HEIGHT,
@@ -191,10 +184,7 @@ export function AppHeader({ embedded = false }: AppHeaderProps) {
                         : 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
                   )}
                 >
-                  {completedCount && completedCount === totalCount ? (
-                    <HiCheck className="text-sm" />
-                  ) : null}
-                  {headerStatus}
+                  {Math.round(progressRatio * 100)}%
                 </span>
               </div>
             }
@@ -209,18 +199,14 @@ export function AppHeader({ embedded = false }: AppHeaderProps) {
                 <span>
                   {sizeFormatter(optimizedSizeSum)} / {sizeFormatter(totalSizeSum)}
                 </span>
-                {savedSize > 0 ? (
-                  <span
-                    className={cn(
-                      summaryBadgeClass,
-                      'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
-                    )}
-                  >
-                    {i18n.textTpl('reduced_by', [String(Math.round(savedRatio * 100))])}
-                  </span>
-                ) : (
-                  <span className="inline-flex h-5 w-22 shrink-0" aria-hidden="true" />
-                )}
+                <span
+                  className={cn(
+                    summaryBadgeClass,
+                    'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
+                  )}
+                >
+                  {i18n.textTpl('reduced_by', [String(Math.round(savedRatio * 100))])}
+                </span>
               </div>
             }
           />
