@@ -17,7 +17,6 @@ concurrency:
 env:
   EMSDK_VERSION: 6.0.4
   NODE_VERSION: 24.18.0
-  PNPM_VERSION: 11.17.0
   RUST_VERSION: 1.97.1
 
 jobs:
@@ -25,7 +24,7 @@ jobs:
     name: Lint, test, and build
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           submodules: recursive
 
@@ -34,17 +33,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential clang cmake nasm ninja-build pkg-config
 
-      - uses: pnpm/action-setup@v6
+      - uses: pnpm/setup@5d160c5bc68a09337ad0d5654e237e03253b5879 # v1
         with:
-          version: ${{ env.PNPM_VERSION }}
+          runtime: node@${{ env.NODE_VERSION }}
+          cache: true
 
-      - uses: actions/setup-node@v7
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c
         with:
           components: rustfmt
           toolchain: ${{ env.RUST_VERSION }}
@@ -53,25 +47,21 @@ jobs:
       - name: Apply native source patches
         run: pnpm run init:src
 
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
         with:
-          key: ci-emsdk-${{ env.EMSDK_VERSION }}-${{ hashFiles('deps/*.patch') }}
           cache-targets: false
 
-      - uses: taiki-e/install-action@v2
+      - uses: taiki-e/install-action@e67fa11c4b9316fa714ddf0abed07a0c3143b95b # v2
         with:
           tool: wasm-pack@0.15.0
           fallback: none
 
-      - uses: emscripten-core/setup-emsdk@v16
+      - uses: emscripten-core/setup-emsdk@4528d102f7230f0e7b276855c01ea1159be0e984 # v16
         with:
           version: ${{ env.EMSDK_VERSION }}
 
       - name: Build shared JS bindings
         run: pnpm run rsts
-
-      - name: Install workspace dependencies
-        run: pnpm install --frozen-lockfile
 
       - name: Build minifier JS wrapper
         run: pnpm --filter @imgo/minifier-js build
@@ -80,7 +70,9 @@ jobs:
         run: pnpm run lint
 
       - name: Build
-        run: pnpm run build
+        run: |
+          pnpm --filter @imgo/minifier-js build:wasm
+          pnpm --filter @imgo/web build
 
       - name: Test
         run: pnpm test

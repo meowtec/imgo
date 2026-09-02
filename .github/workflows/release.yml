@@ -20,7 +20,6 @@ concurrency:
 
 env:
   NODE_VERSION: 24.18.0
-  PNPM_VERSION: 11.17.0
   RUST_VERSION: 1.97.1
 
 jobs:
@@ -28,7 +27,6 @@ jobs:
     name: Validate release metadata
     runs-on: ubuntu-24.04
     outputs:
-      checkout-ref: ${{ steps.metadata.outputs.checkout-ref }}
       tag: ${{ steps.metadata.outputs.tag }}
       version: ${{ steps.metadata.outputs.version }}
       prerelease: ${{ steps.metadata.outputs.prerelease }}
@@ -48,14 +46,9 @@ jobs:
           fi
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          fetch-depth: 0
-          ref: ${{ steps.ref.outputs.tag }}
-          submodules: recursive
-
-      - name: Apply native source patches
-        run: npm run init:src
+          ref: refs/tags/${{ steps.ref.outputs.tag }}
 
       - name: Validate versions
         id: metadata
@@ -63,25 +56,19 @@ jobs:
         env:
           TAG: ${{ steps.ref.outputs.tag }}
         run: |
-          if [[ ! "$TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$ ]]; then
-            echo "Invalid release tag: $TAG" >&2
+          app_version="$(jq -r '.version' app/package.json)"
+          if [[ "$TAG" != "v$app_version" ]]; then
+            echo "Version mismatch: tag=$TAG app=$app_version" >&2
             exit 1
           fi
 
-          version="${TAG#v}"
-          app_version="$(jq -r '.version' app/package.json)"
+          version="$app_version"
           if [[ "$version" == *-* ]]; then
             prerelease=true
           else
             prerelease=false
           fi
 
-          if [[ "$app_version" != "$version" ]]; then
-            echo "Version mismatch: tag=$version app=$app_version" >&2
-            exit 1
-          fi
-
-          echo "checkout-ref=$TAG" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
@@ -91,20 +78,17 @@ jobs:
     needs: metadata
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          ref: ${{ needs.metadata.outputs.checkout-ref }}
+          ref: refs/tags/${{ needs.metadata.outputs.tag }}
           submodules: recursive
 
-      - uses: pnpm/action-setup@v6
+      - uses: pnpm/setup@5d160c5bc68a09337ad0d5654e237e03253b5879 # v1
         with:
-          version: ${{ env.PNPM_VERSION }}
+          runtime: node@${{ env.NODE_VERSION }}
+          install: false
 
-      - uses: actions/setup-node@v7
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c
         with:
           toolchain: ${{ env.RUST_VERSION }}
           targets: wasm32-unknown-unknown
@@ -112,12 +96,12 @@ jobs:
       - name: Apply native source patches
         run: pnpm run init:src
 
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
         with:
           key: shared-js-${{ hashFiles('deps/*.patch') }}
           workspaces: . -> target
 
-      - uses: taiki-e/install-action@v2
+      - uses: taiki-e/install-action@e67fa11c4b9316fa714ddf0abed07a0c3143b95b # v2
         with:
           tool: wasm-pack@0.15.0
           fallback: none
@@ -125,7 +109,7 @@ jobs:
       - name: Build shared JS bindings
         run: pnpm run rsts
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: shared-js-${{ needs.metadata.outputs.version }}
           path: crates/shared-js/pkg
@@ -198,9 +182,9 @@ jobs:
             artifact: target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          ref: ${{ needs.metadata.outputs.checkout-ref }}
+          ref: refs/tags/${{ needs.metadata.outputs.tag }}
           submodules: recursive
 
       - name: Install Linux build dependencies
@@ -243,6 +227,7 @@ jobs:
           # there is no versioned `nasm@2` formula).
           if [[ "${{ matrix.target }}" == "x86_64-apple-darwin" ]] && ! nasm -v 2>/dev/null | grep -q '^NASM version 2\.'; then
             curl -fsSL "https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/nasm-2.16.03.tar.gz" -o /tmp/nasm-2.16.03.tar.gz
+            echo "5bc940dd8a4245686976a8f7e96ba9340a0915f2d5b88356874890e207bdb581  /tmp/nasm-2.16.03.tar.gz" | shasum -a 256 -c -
             tar -xzf /tmp/nasm-2.16.03.tar.gz -C /tmp
             cd /tmp/nasm-2.16.03
             ./configure
@@ -258,17 +243,12 @@ jobs:
           cmake --version
           ninja --version
 
-      - uses: pnpm/action-setup@v6
+      - uses: pnpm/setup@5d160c5bc68a09337ad0d5654e237e03253b5879 # v1
         with:
-          version: ${{ env.PNPM_VERSION }}
+          runtime: node@${{ env.NODE_VERSION }}
+          cache: true
 
-      - uses: actions/setup-node@v7
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c
         with:
           toolchain: ${{ env.RUST_VERSION }}
           targets: ${{ matrix.target }}
@@ -276,18 +256,15 @@ jobs:
       - name: Apply native source patches
         run: pnpm run init:src
 
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
         with:
           key: ${{ matrix.target }}-${{ hashFiles('deps/*.patch') }}
           workspaces: . -> target
 
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: shared-js-${{ needs.metadata.outputs.version }}
           path: crates/shared-js/pkg
-
-      - name: Install workspace dependencies
-        run: pnpm install --frozen-lockfile
 
       - name: Build minifier JS wrapper
         run: pnpm --filter @imgo/minifier-js build
@@ -367,7 +344,7 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: IMGo-${{ needs.metadata.outputs.version }}-${{ matrix.os }}-${{ matrix.arch }}
           path: ${{ matrix.artifact }}
@@ -376,64 +353,23 @@ jobs:
 
   publish:
     name: Publish release
-    needs: [metadata, prepare-app, build-desktop]
+    needs: [metadata, build-desktop]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           pattern: IMGo-${{ needs.metadata.outputs.version }}-*
           path: release-assets
           merge-multiple: true
 
-      - name: Validate release assets
-        shell: bash
-        run: |
-          mapfile -t debs < <(find release-assets -type f -name '*.deb')
-          mapfile -t rpms < <(find release-assets -type f -name '*.rpm')
-          mapfile -t appimages < <(find release-assets -type f -name '*.AppImage')
-          mapfile -t flatpaks < <(find release-assets -type f -name '*.flatpak')
-          mapfile -t installers < <(find release-assets -type f -name '*-setup.exe')
-          mapfile -t portables < <(find release-assets -type f -name '*_portable.zip')
-          mapfile -t dmgs < <(find release-assets -type f -name '*.dmg')
-
-          if [[ "${#debs[@]}" -ne 2 || "${#rpms[@]}" -ne 2 || "${#appimages[@]}" -ne 2 || "${#flatpaks[@]}" -ne 2 || "${#installers[@]}" -ne 2 || "${#portables[@]}" -ne 2 || "${#dmgs[@]}" -ne 2 ]]; then
-            echo "Expected 2 DEBs, 2 RPMs, 2 AppImages, 2 Flatpaks, 2 NSIS installers, 2 portable ZIPs, and 2 DMGs." >&2
-            find release-assets -type f -print >&2
-            exit 1
-          fi
-
-      - name: Create or update release
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          TAG: ${{ needs.metadata.outputs.tag }}
-          PRERELEASE: ${{ needs.metadata.outputs.prerelease }}
-        run: |
-          mapfile -d '' -t assets < <(
-            find release-assets -type f \
-              \( -name '*.deb' -o -name '*.rpm' -o -name '*.AppImage' -o -name '*.flatpak' -o -name '*-setup.exe' -o -name '*_portable.zip' -o -name '*.dmg' \) \
-              -print0
-          )
-
-          if release_json="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" 2>/dev/null)"; then
-            if [[ "$(jq -r '.prerelease' <<< "$release_json")" != "$PRERELEASE" ]]; then
-              echo "Refusing to change the release type for $TAG." >&2
-              exit 1
-            fi
-            gh release upload "$TAG" "${assets[@]}" --clobber
-          else
-            release_args=(
-              --generate-notes
-              --title "IMGo $TAG"
-              --verify-tag
-            )
-            if [[ "$PRERELEASE" == "true" ]]; then
-              release_args+=(--prerelease)
-            else
-              release_args+=(--latest)
-            fi
-            gh release create "$TAG" "${assets[@]}" "${release_args[@]}"
-          fi
+      - uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
+        with:
+          tag_name: ${{ needs.metadata.outputs.tag }}
+          name: IMGo ${{ needs.metadata.outputs.tag }}
+          prerelease: ${{ needs.metadata.outputs.prerelease }}
+          make_latest: ${{ needs.metadata.outputs.prerelease == 'false' }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: release-assets/**
