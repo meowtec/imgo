@@ -169,15 +169,19 @@ jobs:
             runner: windows-2025
             target: x86_64-pc-windows-msvc
             bundle: nsis
-            expected_artifacts: 1
-            artifact: target/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
+            expected_artifacts: 2
+            artifact: |
+              target/x86_64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
+              target/x86_64-pc-windows-msvc/release/bundle/portable/*_portable.zip
           - os: windows
             arch: arm64
             runner: windows-11-arm
             target: aarch64-pc-windows-msvc
             bundle: nsis
-            expected_artifacts: 1
-            artifact: target/aarch64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
+            expected_artifacts: 2
+            artifact: |
+              target/aarch64-pc-windows-msvc/release/bundle/nsis/*-setup.exe
+              target/aarch64-pc-windows-msvc/release/bundle/portable/*_portable.zip
           - os: macos
             arch: x64
             runner: macos-15-intel
@@ -294,6 +298,23 @@ jobs:
           APPLE_SIGNING_IDENTITY: ${{ runner.os == 'macOS' && '-' || '' }}
         run: pnpm --dir app tauri build --target ${{ matrix.target }} --bundles ${{ matrix.bundle }}
 
+      - name: Build Windows portable bundle
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          ARCH: ${{ matrix.arch }}
+          TARGET: ${{ matrix.target }}
+          VERSION: ${{ needs.metadata.outputs.version }}
+        run: |
+          $bundleDir = "target/$env:TARGET/release/bundle/portable"
+          $portableName = "IMGo_{0}_{1}" -f $env:VERSION, $env:ARCH
+          $portableDir = "$bundleDir/$portableName"
+
+          New-Item -ItemType Directory -Force -Path "$portableDir/i18n" | Out-Null
+          Copy-Item "target/$env:TARGET/release/IMGo.exe" "$portableDir/IMGo.exe"
+          Copy-Item "app/src-tauri/i18n/*" "$portableDir/i18n"
+          Compress-Archive -Path "$portableDir/*" -DestinationPath "$bundleDir/${portableName}_portable.zip"
+
       - name: Build Flatpak bundle
         if: runner.os == 'Linux'
         shell: bash
@@ -374,10 +395,11 @@ jobs:
           mapfile -t appimages < <(find release-assets -type f -name '*.AppImage')
           mapfile -t flatpaks < <(find release-assets -type f -name '*.flatpak')
           mapfile -t installers < <(find release-assets -type f -name '*-setup.exe')
+          mapfile -t portables < <(find release-assets -type f -name '*_portable.zip')
           mapfile -t dmgs < <(find release-assets -type f -name '*.dmg')
 
-          if [[ "${#debs[@]}" -ne 2 || "${#rpms[@]}" -ne 2 || "${#appimages[@]}" -ne 2 || "${#flatpaks[@]}" -ne 2 || "${#installers[@]}" -ne 2 || "${#dmgs[@]}" -ne 2 ]]; then
-            echo "Expected 2 DEBs, 2 RPMs, 2 AppImages, 2 Flatpaks, 2 NSIS installers, and 2 DMGs." >&2
+          if [[ "${#debs[@]}" -ne 2 || "${#rpms[@]}" -ne 2 || "${#appimages[@]}" -ne 2 || "${#flatpaks[@]}" -ne 2 || "${#installers[@]}" -ne 2 || "${#portables[@]}" -ne 2 || "${#dmgs[@]}" -ne 2 ]]; then
+            echo "Expected 2 DEBs, 2 RPMs, 2 AppImages, 2 Flatpaks, 2 NSIS installers, 2 portable ZIPs, and 2 DMGs." >&2
             find release-assets -type f -print >&2
             exit 1
           fi
@@ -392,7 +414,7 @@ jobs:
         run: |
           mapfile -d '' -t assets < <(
             find release-assets -type f \
-              \( -name '*.deb' -o -name '*.rpm' -o -name '*.AppImage' -o -name '*.flatpak' -o -name '*-setup.exe' -o -name '*.dmg' \) \
+              \( -name '*.deb' -o -name '*.rpm' -o -name '*.AppImage' -o -name '*.flatpak' -o -name '*-setup.exe' -o -name '*_portable.zip' -o -name '*.dmg' \) \
               -print0
           )
 
