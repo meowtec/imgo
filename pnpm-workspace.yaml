@@ -2,7 +2,7 @@ packages:
   - app
   - website
   - crates/minifier-js
-  - crates/shared-js/pkg
+  - crates/shared-js
 allowBuilds:
   '@parcel/watcher': true
   esbuild: true

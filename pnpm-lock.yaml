@@ -46,7 +46,7 @@ importers:
         version: link:../crates/minifier-js
       '@imgo/shared-js':
         specifier: workspace:^
-        version: link:../crates/shared-js/pkg
+        version: link:../crates/shared-js
       '@mui/material':
         specifier: ^9.2.0
         version: 9.2.0(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.8)(supports-color@10.2.2))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.8)(supports-color@10.2.2))(@types/react@19.2.17)(react@19.2.8)(supports-color@10.2.2))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -263,7 +263,7 @@ importers:
     dependencies:
       '@imgo/shared-js':
         specifier: workspace:*
-        version: link:../shared-js/pkg
+        version: link:../shared-js
       msgpackr:
         specifier: ^2.0.4
         version: 2.0.4
@@ -284,7 +284,7 @@ importers:
         specifier: ^4.1.10
         version: 4.1.10(@types/node@26.1.1)(vite@8.1.5(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.8.0(supports-color@10.2.2))(sass@1.102.0)(tsx@4.23.1)(yaml@2.7.0))
 
-  crates/shared-js/pkg: {}
+  crates/shared-js: {}
 
   website:
     dependencies:

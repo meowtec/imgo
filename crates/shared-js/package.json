@@ -1,0 +1,12 @@
+{
+  "name": "@imgo/shared-js",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./pkg/shared_js.js",
+  "types": "./pkg/shared_js.d.ts",
+  "sideEffects": [
+    "./pkg/shared_js.js",
+    "./pkg/snippets/*"
+  ]
+}
