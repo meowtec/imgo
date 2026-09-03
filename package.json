@@ -30,12 +30,12 @@
     "benchmark:quality": "node benchmark/quality-calibration.mjs"
   },
   "devDependencies": {
-    "@types/node": "^26.1.1",
+    "@types/node": "^26.4.1",
     "eslint-plugin-react-hooks": "^7.1.1",
-    "oxlint": "^1.26.0",
+    "oxlint": "^1.81.0",
     "oxlint-tsgolint": "^7.0.2001",
     "prettier": "^3.9.6",
-    "tsx": "^4.23.1",
-    "typescript": "^6.0.3"
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
   }
 }

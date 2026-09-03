@@ -3,7 +3,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import createSvgSpritePlugin from 'vite-plugin-svg-sprite';
 import wasm from 'vite-plugin-wasm';
-import { watchI18n } from './scripts/i18n-gen';
+import { watchI18n } from './scripts/i18n-gen.ts';
 
 const RUNTIME = process.env.RUNTIME ?? 'tauri';
 const APP_BASE = process.env.APP_BASE ?? '/online/';
@@ -30,12 +30,12 @@ export default defineConfig(({ command }) => {
     },
     resolve: {
       alias: {
-        '@/gen-types': path.resolve(__dirname, './src-tauri/bindings'),
+        '@/gen-types': path.resolve(import.meta.dirname, './src-tauri/bindings'),
         '@/platform': path.resolve(
-          __dirname,
+          import.meta.dirname,
           RUNTIME === 'web' ? './src/platform/web/index.ts' : './src/platform/tauri/index.ts',
         ),
-        '@': path.resolve(__dirname, './src'),
+        '@': path.resolve(import.meta.dirname, './src'),
       },
     },
     server: {

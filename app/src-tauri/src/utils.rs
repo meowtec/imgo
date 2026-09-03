@@ -1,8 +1,5 @@
 use sha2::{self, Digest};
-use std::{
-  error::Error,
-  io::{copy, Read},
-};
+use std::{error::Error, io::Read};
 
 fn bytes_to_string(bytes: &[u8]) -> String {
   hex::encode(bytes)
@@ -10,7 +7,14 @@ fn bytes_to_string(bytes: &[u8]) -> String {
 
 pub fn hash_from_read<T: Read>(mut file: T) -> Result<String, Box<dyn Error>> {
   let mut context = sha2::Sha512::new();
-  copy(&mut file, &mut context)?;
+  let mut buffer = [0; 8192];
+  loop {
+    let count = file.read(&mut buffer)?;
+    if count == 0 {
+      break;
+    }
+    context.update(&buffer[..count]);
+  }
   let result: &[u8] = &context.finalize();
   Ok(bytes_to_string(&result[0..16]))
 }

@@ -21,13 +21,13 @@
   "license": "ISC",
   "dependencies": {
     "@imgo/shared-js": "workspace:*",
-    "msgpackr": "^2.0.4"
+    "msgpackr": "^2.1.0"
   },
   "devDependencies": {
     "@types/jest-image-snapshot": "^6.4.1",
     "@types/minimist": "^1.2.5",
     "jest-image-snapshot": "^6.5.2",
     "minimist": "^1.2.8",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   }
 }

@@ -5,11 +5,11 @@ authors = ["meowtec <bertonzh@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-wasm-bindgen = "0.2.126"
+wasm-bindgen = "0.2.127"
 serde = { version = "1.0.229", features = ["derive"] }
 image = { version = "0.25", default-features = false }
 anyhow = "1.0.104"
-tsify = "0.5.6"
+tsify = "0.5.8"
 ts-rs = "12.0.1"
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
@@ -19,4 +19,4 @@ ts-rs = "12.0.1"
 console_error_panic_hook = { version = "0.1.7", optional = true }
 
 [dev-dependencies]
-wasm-bindgen-test = "0.3.76"
+wasm-bindgen-test = "0.3.77"

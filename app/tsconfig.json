@@ -10,6 +10,7 @@
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
     "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
     "outDir": "./_dist",
     "paths": {
       "@/*": ["./src/*"],

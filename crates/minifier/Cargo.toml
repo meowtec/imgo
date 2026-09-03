@@ -11,7 +11,7 @@ log = "0.4"
 image = { version = "0.25", default-features = false}
 mozjpeg = "0.10.13"
 # "parallel", "zopfli" not supported or need more memory on wasm
-oxipng = { version = "10.1.1", default-features = false }
+oxipng = { version = "10.2.1", default-features = false }
 png = "0.18.1"
 webp = { git = "https://github.com/meowtec/rust-webp.git", branch = "feat/memory-reduce" }
 # disable thread_local for avoiding versions conflict
@@ -34,10 +34,10 @@ libavif-sys = { version = "0.17.0", default-features = false, features = ["codec
 rgb = "0.8"
 jpegxl-rs = { version = "0.15.0", default-features = false, features = ["vendored", "image"]}
 # lcms2 = "6.0.0"
-libheif-rs = "2.7.0"
+libheif-rs = "3.0.0"
 anyhow = "1.0.104"
 # num = "0.4"
-num-derive = "0.4"
+num-derive = "0.5"
 num-traits = "0.2"
 
 [features]

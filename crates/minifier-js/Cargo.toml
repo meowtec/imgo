@@ -12,5 +12,5 @@ serde = { version = "1.0.229", features = ["derive"] }
 serde_bytes = "0.11.19"
 minifier = { path = "../minifier", default-features = false, features = ["basic-image-formats", "heif", "avif"]}
 num = "0.4"
-num-derive = "0.4"
+num-derive = "0.5"
 num-traits = "0.2"

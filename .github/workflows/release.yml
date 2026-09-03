@@ -83,7 +83,7 @@ jobs:
           ref: refs/tags/${{ needs.metadata.outputs.tag }}
           submodules: recursive
 
-      - uses: pnpm/setup@5d160c5bc68a09337ad0d5654e237e03253b5879 # v1
+      - uses: pnpm/setup@2270f39ef63c3edf50be34da68c039eca5e15c15 # v2.1.0
         with:
           runtime: node@${{ env.NODE_VERSION }}
           install: false
@@ -243,7 +243,7 @@ jobs:
           cmake --version
           ninja --version
 
-      - uses: pnpm/setup@5d160c5bc68a09337ad0d5654e237e03253b5879 # v1
+      - uses: pnpm/setup@2270f39ef63c3edf50be34da68c039eca5e15c15 # v2.1.0
         with:
           runtime: node@${{ env.NODE_VERSION }}
           cache: true

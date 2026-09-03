@@ -1,14 +1,12 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 use tsify::Tsify;
-use wasm_bindgen::prelude::*;
 
 fn default_quality() -> u8 {
   85
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Hash, Deserialize, Serialize, Tsify, TS)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum ImageFormat {
   Png = 1,
@@ -32,14 +30,12 @@ pub enum ImageFormat {
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Tsify, TS)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
 pub struct Size {
   pub width: u32,
   pub height: u32,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Tsify, TS)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum ResizeType {
   Exact = 0,

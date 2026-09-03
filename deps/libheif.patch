@@ -1,5 +1,20 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 17d8ae6a..58664c36 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -604,7 +604,9 @@ else ()
+     set(CMAKE_CXX_VISIBILITY_PRESET default)
+ endif ()
+ 
+-add_subdirectory(heifio)
++if(WITH_EXAMPLES)
++    add_subdirectory(heifio)
++endif()
+ 
+ if(WITH_EXAMPLES)
+     add_subdirectory (examples)
 diff --git a/libheif/CMakeLists.txt b/libheif/CMakeLists.txt
-index 6f6bda27..baf2ba28 100644
+index bddfc6e6..8f7ce4f5 100644
 --- a/libheif/CMakeLists.txt
 +++ b/libheif/CMakeLists.txt
 @@ -253,7 +253,9 @@ endif()
@@ -13,19 +28,3 @@ index 6f6bda27..baf2ba28 100644
  
  if (PLUGIN_LOADING_SUPPORTED_AND_ENABLED)
      target_compile_definitions(heif PRIVATE ENABLE_PLUGIN_LOADING=1)
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index f4439944..18f5bf19 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -597,5 +597,7 @@
--add_subdirectory(heifio)
--
--if(WITH_EXAMPLES)
--    add_subdirectory (examples)
-+if(WITH_EXAMPLES)
-+    add_subdirectory(heifio)
-+endif()
-+
-+if(WITH_EXAMPLES)
-+    add_subdirectory (examples)
- endif()
