@@ -1,4 +1,5 @@
 ---
+import logoImg from '../assets/logo.png';
 import { getSiteCopy, type Locale } from '../i18n';
 
 interface Props {
@@ -12,12 +13,20 @@ const { appLabel, loading } = copy.workbench;
 
 <div class="app-window" role="region" aria-label={appLabel}>
   <div class="app-window__titlebar" aria-hidden="true">
-    <div class="app-window__controls">
-      <span class="app-window__control app-window__control--close"></span>
-      <span class="app-window__control app-window__control--minimize"></span>
-      <span class="app-window__control app-window__control--zoom"></span>
+    <div class="app-window__identity">
+      <span
+        class="app-window__mark"
+        style={`--app-window-logo: url("${logoImg.src}")`}
+      ></span>
+      <span class="app-window__title">IMGo</span>
+      <span class="app-window__edition">WEB ENGINE</span>
     </div>
-    <span class="app-window__title">IMGo</span>
+    <div class="app-window__status">
+      <span class="app-window__signal"></span>
+      <span>LOCAL</span>
+      <span class="app-window__divider"></span>
+      <span>WASM</span>
+    </div>
   </div>
   <div class="app-window__content">
     <div
@@ -38,6 +47,10 @@ const { appLabel, loading } = copy.workbench;
 </script>
 
 <style>
+  /* Hallmark · pre-emit critique: P4 H4 E4 S5 R5 V4 */
+  /* Hallmark · component: embedded workbench shell · genre: modern-minimal · theme: Coral
+   * direction: precision image engine · designed-as-app · design-system: design.md · contrast: pass
+   */
   .app-window {
     width: min(100%, var(--app-max));
     margin-inline: auto;
@@ -49,47 +62,77 @@ const { appLabel, loading } = copy.workbench;
   }
 
   .app-window__titlebar {
-    position: relative;
-    display: grid;
+    display: flex;
     min-height: var(--window-titlebar-height);
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
-    border-block-end: var(--rule-hair) solid var(--color-window-rule);
+    justify-content: space-between;
+    gap: var(--space-md);
     padding-inline: var(--space-md);
     background: var(--color-window-bar);
+    color: var(--color-window-ink);
     user-select: none;
   }
 
-  .app-window__controls {
+  .app-window__identity,
+  .app-window__status {
     display: flex;
+    min-width: 0;
+    align-items: center;
+  }
+
+  .app-window__identity {
     gap: var(--space-xs);
-    justify-self: start;
   }
 
-  .app-window__control {
-    width: var(--window-control-size);
-    height: var(--window-control-size);
-    border: var(--rule-hair) solid var(--color-window-control-rule);
-    border-radius: var(--radius-round);
+  .app-window__mark {
+    width: var(--window-mark-size);
+    height: var(--window-mark-size);
+    flex: 0 0 auto;
+    background: var(--color-window-accent);
+    mask: var(--app-window-logo) center / contain no-repeat;
+    -webkit-mask: var(--app-window-logo) center / contain no-repeat;
   }
 
-  .app-window__control--close {
-    background: var(--color-window-close);
-  }
-
-  .app-window__control--minimize {
-    background: var(--color-window-minimize);
-  }
-
-  .app-window__control--zoom {
-    background: var(--color-window-zoom);
+  .app-window__title,
+  .app-window__edition,
+  .app-window__status {
+    font-family: var(--font-mono);
+    letter-spacing: 0;
+    line-height: 1;
   }
 
   .app-window__title {
-    grid-column: 2;
-    color: var(--color-muted);
-    font-size: var(--text-xs);
+    font-size: var(--text-sm);
     font-weight: 600;
+  }
+
+  .app-window__edition {
+    overflow: hidden;
+    color: var(--color-window-muted);
+    font-size: var(--text-xs);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .app-window__status {
+    flex: 0 0 auto;
+    gap: var(--space-xs);
+    color: var(--color-window-muted);
+    font-size: var(--text-xs);
+  }
+
+  .app-window__signal {
+    width: var(--window-signal-size);
+    height: var(--window-signal-size);
+    border-radius: var(--radius-round);
+    background: var(--color-window-accent);
+    box-shadow: 0 0 0 var(--space-3xs) var(--color-window-accent-soft);
+  }
+
+  .app-window__divider {
+    width: var(--rule-hair);
+    height: var(--space-sm);
+    background: var(--color-window-rule-dark);
   }
 
   .app-window__content {
@@ -116,6 +159,12 @@ const { appLabel, loading } = copy.workbench;
   }
 
   @media (max-width: 30rem) {
+    .app-window__edition,
+    .app-window__divider,
+    .app-window__status span:last-child {
+      display: none;
+    }
+
     .app-window__titlebar {
       padding-inline: var(--space-sm);
     }

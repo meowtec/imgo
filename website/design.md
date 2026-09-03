@@ -61,6 +61,7 @@ Ft5 Statement: one factual privacy statement followed by a small metadata row.
 - The primary message is local, private, multi-file image processing.
 - Product claims must be traceable to implementation.
 - Do not invent compression ratios, speed claims, user counts, testimonials, customer logos, certifications, or upload-security claims.
-- The homepage workbench embeds the real web app in a non-interactive macOS-style application window.
+- The homepage workbench embeds the real web app in a non-interactive IMGo processing shell with compact technical status details.
+- The processing shell must look product-specific rather than imitate macOS, Windows, browser, or IDE chrome.
 - Do not draw fake browser chrome or use static interface illustrations in place of the real app.
 - App pages do not add decorative enrichment.

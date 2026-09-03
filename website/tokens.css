@@ -22,12 +22,13 @@
   --color-preview-cool: oklch(67% 0.08 220);
   --color-preview-deep: oklch(35% 0.05 38);
   --color-preview-light: oklch(92% 0.04 65);
-  --color-window-bar: oklch(96.5% 0.006 48);
-  --color-window-rule: oklch(82% 0.012 48);
-  --color-window-control-rule: oklch(45% 0.02 38 / 0.22);
-  --color-window-close: oklch(66% 0.2 28);
-  --color-window-minimize: oklch(79% 0.16 85);
-  --color-window-zoom: oklch(67% 0.16 145);
+  --color-window-bar: oklch(19% 0.014 38);
+  --color-window-ink: oklch(97% 0.006 48);
+  --color-window-muted: oklch(73% 0.012 48);
+  --color-window-accent: oklch(66.9% 0.184 248.8);
+  --color-window-accent-soft: oklch(66.9% 0.184 248.8 / 0.18);
+  --color-window-rule: oklch(68% 0.014 48);
+  --color-window-rule-dark: oklch(47% 0.014 38);
 
   --font-display: 'Geist', ui-sans-serif, system-ui, sans-serif;
   --font-body: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
@@ -66,21 +67,22 @@
   --radius-card: 8px;
   --radius-preview: 8px;
   --radius-panel: 8px;
-  --radius-window: 16px;
+  --radius-window: 6px;
   --radius-round: 999px;
   --shadow-panel: 0 24px 60px -42px oklch(20% 0.02 38 / 0.28);
   --shadow-nav: 0 12px 36px -24px oklch(20% 0.02 38 / 0.24);
   --shadow-menu: 0 18px 40px -24px oklch(20% 0.02 38 / 0.32);
   --shadow-pin: 0 8px 18px -8px oklch(20% 0.02 38 / 0.4);
   --shadow-window:
-    0 32px 80px -42px oklch(20% 0.02 38 / 0.42), 0 12px 28px -20px oklch(20% 0.02 38 / 0.26);
+    0 36px 72px -44px oklch(20% 0.02 38 / 0.38), 0 12px 24px -20px oklch(20% 0.02 38 / 0.22);
   --page-gutter: clamp(1rem, 5vw, 5.5rem);
   --page-max: 80rem;
   --app-max: 60rem;
   --header-max: 52rem;
   --header-height: 4.75rem;
-  --window-titlebar-height: 2.75rem;
-  --window-control-size: 0.75rem;
+  --window-titlebar-height: 3.25rem;
+  --window-mark-size: 1.125rem;
+  --window-signal-size: 0.375rem;
   --window-content-height: clamp(32rem, 64vw, 42rem);
 
   --z-base: 1;
