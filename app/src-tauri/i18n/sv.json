@@ -101,5 +101,7 @@
   "high_quality": "Hög kvalitet",
   "highest_quality": "Högsta kvalitet",
   "lossless": "Förlustfri",
-  "delete_task": "Ta bort uppgift"
+  "delete_task": "Ta bort uppgift",
+  "new_file_name_suffix": "Suffix för nytt filnamn",
+  "new_file_name_suffix_description": "Används vid spara med ett nytt namn. Till exempel gör \"-new\" att a.png blir a-new.png eller a-new.webp."
 }

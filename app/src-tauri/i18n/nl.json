@@ -101,5 +101,7 @@
   "high_quality": "Hoge kwaliteit",
   "highest_quality": "Hoogste kwaliteit",
   "lossless": "Zonder verlies",
-  "delete_task": "Taak verwijderen"
+  "delete_task": "Taak verwijderen",
+  "new_file_name_suffix": "Achtervoegsel voor nieuwe bestandsnaam",
+  "new_file_name_suffix_description": "Gebruikt bij opslaan onder een nieuwe naam. Bijvoorbeeld: \"-new\" maakt van a.png a-new.png of a-new.webp."
 }

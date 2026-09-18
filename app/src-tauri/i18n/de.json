@@ -101,5 +101,7 @@
   "high_quality": "Hohe Qualität",
   "highest_quality": "Höchste Qualität",
   "lossless": "Verlustfrei",
-  "delete_task": "Aufgabe löschen"
+  "delete_task": "Aufgabe löschen",
+  "new_file_name_suffix": "Suffix für neuen Dateinamen",
+  "new_file_name_suffix_description": "Wird beim Speichern unter einem neuen Namen verwendet. Beispiel: „-new“ macht aus a.png die Datei a-new.png oder a-new.webp."
 }

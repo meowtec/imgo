@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, subscribeWithSelector } from 'zustand/middleware';
 import { ALL_FORMAT } from '@/types';
-import { DEFAULT_SKIP_SAVE_MIN_RATIO } from '@/constants/app';
+import { DEFAULT_NEW_FILE_NAME_SUFFIX, DEFAULT_SKIP_SAVE_MIN_RATIO } from '@/constants/app';
 import type { StoreState } from './types';
 
 export const viewBoxTasks = new Set<string>();
@@ -17,6 +17,7 @@ const initialState: StoreState = {
   appOptions: {
     skipSaveType: 'NONE',
     skipSaveMinRatio: DEFAULT_SKIP_SAVE_MIN_RATIO,
+    newFileNameSuffix: DEFAULT_NEW_FILE_NAME_SUFFIX,
     globalDefaultOptions: [
       {
         inputFormats: [ALL_FORMAT],
@@ -40,6 +41,17 @@ export const useStore = create(
       partialize: (state) => ({
         appOptions: state.appOptions,
       }),
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState as Partial<StoreState> | undefined;
+        return {
+          ...currentState,
+          ...persisted,
+          appOptions: {
+            ...currentState.appOptions,
+            ...persisted?.appOptions,
+          },
+        };
+      },
     }),
   ),
 );

@@ -32,6 +32,27 @@ fn reform_ext_if_needed<P: Into<PathBuf>>(path: P, format: ImageFormat) -> PathB
   }
 }
 
+fn apply_file_stem_suffix<P: Into<PathBuf>>(path: P, suffix: &str) -> PathBuf {
+  let path = path.into();
+  if suffix.is_empty() {
+    return path;
+  }
+
+  let ext = path.extension().map(|ext| ext.to_os_string());
+  let stem = path
+    .file_stem()
+    .map(|f| f.to_string_lossy().into_owned())
+    .unwrap_or_else(|| "untitled".to_string());
+
+  let mut next_path = path;
+  next_path.set_file_name(format!("{stem}{suffix}"));
+  if let Some(ext) = ext {
+    next_path.set_extension(ext);
+  }
+
+  next_path
+}
+
 fn find_unoccupied_file_path<P: Into<PathBuf>>(path: P) -> PathBuf {
   let path: PathBuf = path.into();
   let ext = path.extension();
@@ -106,7 +127,9 @@ pub fn blocking_save_files(
   app_handle: AppHandle,
   images: Vec<ImageObject>,
   save_type: SaveFilesTriggerType,
+  new_file_name_suffix: Option<String>,
 ) -> Vec<String> {
+  let new_file_name_suffix = new_file_name_suffix.unwrap_or_default();
   let dest_files: Vec<FinalSaveFile> = match save_type {
     SaveFilesTriggerType::SaveAs => {
       if images.len() != 1 {
@@ -151,7 +174,10 @@ pub fn blocking_save_files(
       .iter()
       .map(|image| {
         let user_file_path = image.source_file_path();
-        let final_path = reform_ext_if_needed(user_file_path, image.format.into());
+        let mut final_path = reform_ext_if_needed(user_file_path, image.format.into());
+        if save_type == SaveFilesTriggerType::AutoNewName {
+          final_path = apply_file_stem_suffix(final_path, &new_file_name_suffix);
+        }
 
         FinalSaveFile {
           image: image.clone(),
@@ -203,7 +229,7 @@ mod tests {
   use minifier::ImageFormat;
   use std::path::PathBuf;
 
-  use super::{find_unoccupied_file_path, reform_ext_if_needed};
+  use super::{apply_file_stem_suffix, find_unoccupied_file_path, reform_ext_if_needed};
 
   #[test]
   fn test_reform_ext_if_needed() {
@@ -238,6 +264,24 @@ mod tests {
     assert_eq!(
       find_unoccupied_file_path("tests/fixtures/file_exists/c.txt"),
       PathBuf::from("tests/fixtures/file_exists/c.txt"),
+    );
+  }
+
+  #[test]
+  fn test_apply_file_stem_suffix() {
+    assert_eq!(
+      apply_file_stem_suffix("/path/to/a.png", "-new"),
+      PathBuf::from("/path/to/a-new.png"),
+    );
+
+    assert_eq!(
+      apply_file_stem_suffix("/path/to/a.webp", "-new"),
+      PathBuf::from("/path/to/a-new.webp"),
+    );
+
+    assert_eq!(
+      apply_file_stem_suffix("/path/to/a.png", ""),
+      PathBuf::from("/path/to/a.png"),
     );
   }
 }

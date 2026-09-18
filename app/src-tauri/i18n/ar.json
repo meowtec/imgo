@@ -101,5 +101,7 @@
   "high_quality": "جودة عالية",
   "highest_quality": "أعلى جودة",
   "lossless": "بدون فقدان",
-  "delete_task": "حذف المهمة"
+  "delete_task": "حذف المهمة",
+  "new_file_name_suffix": "لاحقة اسم الملف الجديد",
+  "new_file_name_suffix_description": "يُستخدم عند الحفظ باسم جديد. على سبيل المثال، تحول \"-new\" الملف a.png إلى a-new.png أو a-new.webp."
 }

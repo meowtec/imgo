@@ -195,6 +195,12 @@ pub async fn save_files(
   app_handle: AppHandle,
   images: Vec<ImageObject>,
   save_type: SaveFilesTriggerType,
+  new_file_name_suffix: Option<String>,
 ) -> Vec<String> {
-  return save_files::blocking_save_files(app_handle, images, save_type);
+  return save_files::blocking_save_files(
+    app_handle,
+    images,
+    save_type,
+    new_file_name_suffix,
+  );
 }

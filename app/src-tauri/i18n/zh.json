@@ -101,5 +101,7 @@
   "high_quality": "高质量",
   "highest_quality": "最高质量",
   "lossless": "无损",
-  "delete_task": "删除任务"
+  "delete_task": "删除任务",
+  "new_file_name_suffix": "新文件名后缀",
+  "new_file_name_suffix_description": "用于「使用新文件名保存」。例如填写 -new 时，a.png 会保存为 a-new.png 或 a-new.webp。"
 }

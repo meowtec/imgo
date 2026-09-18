@@ -307,6 +307,7 @@ export const mutations = {
     const savedIds = await saveFiles({
       images,
       saveType: type,
+      newFileNameSuffix: useStore.getState().appOptions.newFileNameSuffix ?? '',
     });
 
     const savedIdSet = new Set(savedIds);

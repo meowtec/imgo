@@ -101,5 +101,7 @@
   "high_quality": "Висок квалитет",
   "highest_quality": "Највиши квалитет",
   "lossless": "Без губитака",
-  "delete_task": "Избриши задатак"
+  "delete_task": "Избриши задатак",
+  "new_file_name_suffix": "Суфикс новог имена датотеке",
+  "new_file_name_suffix_description": "Користи се при чувању под новим именом. На пример, „-new“ од a.png прави a-new.png или a-new.webp."
 }

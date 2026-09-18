@@ -65,7 +65,7 @@ function ThemeSelect() {
       onChange={handleChange}
       value={appTheme}
       placeholder={i18n.text('theme_color')}
-      triggerClassName="w-[200px]"
+      triggerClassName="w-50"
       options={[
         {
           value: 'light',
@@ -121,7 +121,7 @@ function profileSupportsLossless(
 function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
   const [activeTab, setActiveTab] = useState(menus[0].key);
   const appOptions = useStore((state) => state.appOptions);
-  const visibleMenus = embedded ? menus.filter((menu) => menu.key !== 'general') : menus;
+  const visibleMenus = menus;
 
   const form = useForm<AppOptions>({
     defaultValues: appOptions,
@@ -139,6 +139,7 @@ function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
       {
         ...omit(formValue, 'appTheme'),
         skipSaveMinRatio: toNumber(formValue.skipSaveMinRatio, DEFAULT_SKIP_SAVE_MIN_RATIO),
+        newFileNameSuffix: formValue.newFileNameSuffix ?? '',
       },
       rerunAll,
     );
@@ -198,7 +199,7 @@ function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
           <SidebarFooter />
         </Sidebar>
 
-        <div className="max-w-[520px] m-8">
+        <div className="max-w-130 m-8">
           <Form {...form}>
             <form
               // onSubmit={form.handleSubmit(handleSubmit)}
@@ -311,7 +312,7 @@ function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
                                       value={field.value}
                                       onChange={handleChangeOutputFormat}
                                       placeholder={i18n.text('output_format')}
-                                      triggerClassName="w-[200px]"
+                                      triggerClassName="w-50"
                                       options={([SAME_FORMAT, ...POPULAR_FORMATS] as const).map(
                                         (format) => ({
                                           value: format,
@@ -339,7 +340,7 @@ function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
                                   <div className="flex items-center gap-4">
                                     <FormControl>
                                       <Slider
-                                        className="w-[160px]"
+                                        className="w-40"
                                         min={10}
                                         max={100}
                                         disabled={profile.options.lossless}
@@ -367,7 +368,7 @@ function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
                                               }
                                             />
                                           </FormControl>
-                                          <FormLabel className="font-normal !mt-0">
+                                          <FormLabel className="font-normal mt-0!">
                                             {i18n.text('lossless')}
                                           </FormLabel>
                                         </FormItem>
@@ -396,7 +397,7 @@ function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
                                     <ResizeInput
                                       value={field.value ?? null}
                                       onChange={field.onChange}
-                                      triggerClassName="w-[200px]"
+                                      triggerClassName="w-50"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -418,7 +419,7 @@ function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
                                         onCheckedChange={field.onChange}
                                       />
                                     </FormControl>
-                                    <FormLabel className="font-normal !mt-0">
+                                    <FormLabel className="font-normal mt-0!">
                                       {i18n.text('preserve_exif')}
                                     </FormLabel>
                                   </div>
@@ -457,7 +458,7 @@ function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
                             value={field.value}
                             onChange={field.onChange}
                             placeholder={i18n.text('skip_method')}
-                            triggerClassName="w-[200px]"
+                            triggerClassName="w-50"
                             options={[
                               {
                                 value: 'NONE',
@@ -488,13 +489,44 @@ function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
                           <FormLabel>{i18n.text('skip_ratio')}</FormLabel>
                           <FormControl>
                             <Input
-                              className="w-[200px]"
+                              className="w-50"
                               type="number"
                               step={0.1}
                               {...field}
                               onBlur={handleSkipSaveMinRatioBlur}
                             />
                           </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+
+                  {RUNTIME !== 'web' && (
+                    <FormField
+                      control={form.control}
+                      name="newFileNameSuffix"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{i18n.text('new_file_name_suffix')}</FormLabel>
+                          <FormControl>
+                            <Input
+                              className="w-50"
+                              placeholder="-new"
+                              {...field}
+                              value={field.value ?? ''}
+                              onChange={(event) => {
+                                field.onChange(event);
+                                mutations.updateAppOptions(
+                                  { newFileNameSuffix: event.target.value },
+                                  false,
+                                );
+                              }}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            {i18n.text('new_file_name_suffix_description')}
+                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -510,11 +542,15 @@ function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
                 </>
               )}
 
-              {!embedded && activeTab === 'general' && (
-                <FormItem>
-                  <FormLabel>{i18n.text('theme_color')}</FormLabel>
-                  <ThemeSelect />
-                </FormItem>
+              {activeTab === 'general' && (
+                <>
+                  {!embedded && (
+                    <FormItem>
+                      <FormLabel>{i18n.text('theme_color')}</FormLabel>
+                      <ThemeSelect />
+                    </FormItem>
+                  )}
+                </>
               )}
             </form>
           </Form>

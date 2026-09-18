@@ -29,6 +29,7 @@ export interface ApiCalls {
     {
       images: ImageObject[];
       saveType: SaveFilesTriggerType;
+      newFileNameSuffix?: string;
     },
     string[],
   ];

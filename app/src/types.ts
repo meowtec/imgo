@@ -69,6 +69,7 @@ export interface GlobalDefaultOptions {
 export interface AppOptions {
   skipSaveType: SkipSaveType;
   skipSaveMinRatio: number;
+  newFileNameSuffix: string;
   globalDefaultOptions: GlobalDefaultOptions[];
   appTheme: AppTheme;
 }

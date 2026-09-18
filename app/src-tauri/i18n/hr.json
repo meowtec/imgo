@@ -101,5 +101,7 @@
   "high_quality": "Visoka kvaliteta",
   "highest_quality": "Najviša kvaliteta",
   "lossless": "Bez gubitaka",
-  "delete_task": "Izbriši zadatak"
+  "delete_task": "Izbriši zadatak",
+  "new_file_name_suffix": "Sufiks novog naziva datoteke",
+  "new_file_name_suffix_description": "Koristi se pri spremanju pod novim imenom. Na primjer, \"-new\" pretvara a.png u a-new.png ili a-new.webp."
 }

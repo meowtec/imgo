@@ -101,5 +101,7 @@
   "very_low_quality": "매우 낮은 품질",
   "visit": "홈페이지 방문",
   "waiting": "대기 중",
-  "width": "너비"
+  "width": "너비",
+  "new_file_name_suffix": "새 파일 이름 접미사",
+  "new_file_name_suffix_description": "「새 이름으로 저장」할 때 사용합니다. 예를 들어 \"-new\"이면 a.png가 a-new.png 또는 a-new.webp가 됩니다."
 }

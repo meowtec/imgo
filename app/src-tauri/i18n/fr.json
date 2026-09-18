@@ -101,5 +101,7 @@
   "high_quality": "Haute qualité",
   "highest_quality": "La plus haute qualité",
   "lossless": "Sans perte",
-  "delete_task": "Supprimer la tâche"
+  "delete_task": "Supprimer la tâche",
+  "new_file_name_suffix": "Suffixe du nouveau nom de fichier",
+  "new_file_name_suffix_description": "Utilisé lors de l’enregistrement sous un nouveau nom. Par exemple, « -new » transforme a.png en a-new.png ou a-new.webp."
 }

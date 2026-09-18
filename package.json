@@ -25,7 +25,7 @@
     "lint": "cargo fmt -p minifier minifier-js minifier-cli imgo-shared IMGo --check && npm run tscheck && npm run oxlint",
     "init:src": "cd deps/libheif-sys && git reset --hard && git apply ../libheif-sys.patch && cd ../libde265 && git reset --hard && git apply ../libde265.patch && cd ../libheif && git reset --hard && git apply ../libheif.patch && cd ../jpegxl-rs && git reset --hard && git apply ../jpegxl-rs.patch",
     "rsts": "cd crates/shared-js && wasm-pack build --release --scope imgo",
-    "init": "git submodule update --init --recursive && pnpm run init:src && npm run rsts && pnpm install && pnpm --filter @imgo/minifier-js build && pnpm --filter @imgo/minifier-js build:wasm",
+    "init": "git submodule update --init --recursive -f && pnpm run init:src && npm run rsts && pnpm install && pnpm --filter @imgo/minifier-js build && pnpm --filter @imgo/minifier-js build:wasm",
     "create-patches": "cd deps/libheif-sys && git diff > ../libheif-sys.patch && cd ../libheif && git diff > ../libheif.patch&& cd ../jpegxl-rs && git diff > ../jpegxl-rs.patch",
     "benchmark:quality": "node benchmark/quality-calibration.mjs"
   },

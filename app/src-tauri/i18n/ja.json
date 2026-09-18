@@ -101,5 +101,7 @@
   "high_quality": "高品質",
   "highest_quality": "最高品質",
   "lossless": "ロスレス",
-  "delete_task": "タスクを削除"
+  "delete_task": "タスクを削除",
+  "new_file_name_suffix": "新しいファイル名の接尾辞",
+  "new_file_name_suffix_description": "「新しい名前で保存」時に使用します。例えば「-new」なら a.png は a-new.png または a-new.webp になります。"
 }
