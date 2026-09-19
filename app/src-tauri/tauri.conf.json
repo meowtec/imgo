@@ -45,8 +45,8 @@
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:12315"
   },
-  "productName": "IMGo",
-  "mainBinaryName": "IMGo",
+  "productName": "imgo",
+  "mainBinaryName": "imgo",
   "version": "../package.json",
   "identifier": "com.meowtec.imgo",
   "plugins": {},
