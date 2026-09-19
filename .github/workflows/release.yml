@@ -284,11 +284,11 @@ jobs:
           VERSION: ${{ needs.metadata.outputs.version }}
         run: |
           $bundleDir = "target/$env:TARGET/release/bundle/portable"
-          $portableName = "IMGo_{0}_{1}" -f $env:VERSION, $env:ARCH
+          $portableName = "imgo_{0}_{1}" -f $env:VERSION, $env:ARCH
           $portableDir = "$bundleDir/$portableName"
 
           New-Item -ItemType Directory -Force -Path "$portableDir/i18n" | Out-Null
-          Copy-Item "target/$env:TARGET/release/IMGo.exe" "$portableDir/IMGo.exe"
+          Copy-Item "target/$env:TARGET/release/imgo.exe" "$portableDir/imgo.exe"
           Copy-Item "app/src-tauri/i18n/*" "$portableDir/i18n"
           Compress-Archive -Path "$portableDir/*" -DestinationPath "$bundleDir/${portableName}_portable.zip"
 
@@ -321,7 +321,7 @@ jobs:
             packaging/flatpak/com.meowtec.imgo.yml
           flatpak build-bundle \
             flatpak-repo \
-            "$bundle_dir/IMGo_${VERSION}_${PACKAGE_ARCH}.flatpak" \
+            "$bundle_dir/imgo_${VERSION}_${PACKAGE_ARCH}.flatpak" \
             com.meowtec.imgo \
             stable
 
