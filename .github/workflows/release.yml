@@ -305,7 +305,7 @@ jobs:
 
           rm -rf "$staging" flatpak-build flatpak-repo
           mkdir -p "$staging" "$bundle_dir"
-          install -m755 "target/$TARGET/release/IMGo" "$staging/IMGo"
+          install -m755 "target/$TARGET/release/imgo" "$staging/imgo"
           install -m644 app/src-tauri/icons/icon.png "$staging/icon.png"
           install -m644 packaging/flatpak/com.meowtec.imgo.desktop "$staging/"
           install -m644 packaging/flatpak/com.meowtec.imgo.metainfo.xml "$staging/"
@@ -334,8 +334,10 @@ jobs:
           shopt -s nullglob
           files=()
           while IFS= read -r pattern; do
-            mapfile -t matches < <(compgen -G "$pattern" || true)
-            files+=("${matches[@]}")
+            [[ -z "$pattern" ]] && continue
+            while IFS= read -r match; do
+              files+=("$match")
+            done < <(compgen -G "$pattern" || true)
           done <<< "$ARTIFACT_GLOBS"
 
           if [[ "${#files[@]}" -ne "$EXPECTED_ARTIFACTS" ]]; then

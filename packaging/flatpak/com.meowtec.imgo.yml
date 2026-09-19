@@ -1,8 +1,8 @@
 app-id: com.meowtec.imgo
 runtime: org.gnome.Platform
-runtime-version: "49"
+runtime-version: '49'
 sdk: org.gnome.Sdk
-command: IMGo
+command: imgo
 
 finish-args:
   - --share=ipc
@@ -15,11 +15,11 @@ modules:
   - name: imgo
     buildsystem: simple
     build-commands:
-      - install -Dm755 IMGo /app/bin/IMGo
+      - install -Dm755 imgo /app/bin/imgo
       - install -Dm644 com.meowtec.imgo.desktop /app/share/applications/com.meowtec.imgo.desktop
       - install -Dm644 com.meowtec.imgo.metainfo.xml /app/share/metainfo/com.meowtec.imgo.metainfo.xml
       - install -Dm644 icon.png /app/share/icons/hicolor/512x512/apps/com.meowtec.imgo.png
-      - install -Dm644 -t /app/lib/IMGo/i18n i18n/*.json
+      - install -Dm644 -t /app/lib/imgo/i18n i18n/*.json
     sources:
       - type: dir
         path: .build
