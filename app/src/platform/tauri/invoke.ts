@@ -21,3 +21,6 @@ export const openSelectFilesDialog = createInvoke('pick_files');
 export const openSelectFoldersDialog = createInvoke('pick_folders');
 export const saveFiles = createInvoke('save_files');
 export const clearFiles = createInvoke('clear_files');
+export const getAppOptions = createInvoke('get_app_options');
+export const setAppOptions = createInvoke('set_app_options');
+export const setHasTasks = createInvoke('set_has_tasks');

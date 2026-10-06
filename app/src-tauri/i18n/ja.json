@@ -70,6 +70,8 @@
   "follow_system": "システム",
   "conversion_settings": "変換設定",
   "general": "一般",
+  "confirm_on_close": "閉じる前に確認",
+  "confirm_on_close_description": "キューが空でない場合、閉じるときに確認を表示します",
   "conversion_profiles": "変換プロファイル",
   "delete_conversion_profile": "変換プロファイルを削除",
   "format": "形式",

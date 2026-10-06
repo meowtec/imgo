@@ -70,6 +70,8 @@
   "follow_system": "System",
   "conversion_settings": "Konverteringsinställningar",
   "general": "Allmänt",
+  "confirm_on_close": "Bekräfta innan stängning",
+  "confirm_on_close_description": "Visa en bekräftelse vid stängning om kön inte är tom",
   "conversion_profiles": "Konverteringsprofiler",
   "delete_conversion_profile": "Ta bort konverteringsprofil",
   "format": "Format",

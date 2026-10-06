@@ -24,11 +24,10 @@ import MultipleSelect from '../ui/multiple-select';
 import {
   ALL_FORMAT,
   SAME_FORMAT,
+  type FormatSelectValue,
   type SkipSaveType,
   type AppTheme,
   type AppOptions,
-  type OptionInputFormat,
-  type OptionOutputFormat,
 } from '@/types';
 import { omit } from 'lodash-es';
 import {
@@ -45,6 +44,7 @@ import {
 } from '../ui/sidebar';
 import { useState } from 'react';
 import type { IconType } from 'react-icons/lib';
+import type { ImageFormat } from '@imgo/shared-js';
 import { ResizeInput } from '../resize-input';
 import { DEFAULT_SKIP_SAVE_MIN_RATIO } from '@/constants/app';
 import { i18n } from '@/lib/i18n';
@@ -84,6 +84,20 @@ function ThemeSelect() {
   );
 }
 
+function ConfirmOnCloseSwitch() {
+  const confirmOnClose = useStore((state) => state.appOptions.confirmOnClose ?? true);
+  const handleChange = (checked: boolean) => {
+    mutations.updateAppOptions(
+      {
+        confirmOnClose: checked,
+      },
+      false,
+    );
+  };
+
+  return <Switch checked={confirmOnClose} onCheckedChange={handleChange} />;
+}
+
 type ActiveTabKey = 'general' | 'optimize';
 
 const menus: Array<{
@@ -103,19 +117,13 @@ const menus: Array<{
   },
 ];
 
-function profileSupportsLossless(
-  inputFormats: OptionInputFormat[],
-  outputFormat: OptionOutputFormat,
-) {
-  if (outputFormat !== SAME_FORMAT) {
+function profileSupportsLossless(inputFormats: ImageFormat[], outputFormat: ImageFormat | null) {
+  if (outputFormat != null) {
     return supportsLossless(outputFormat);
   }
 
-  return (
-    inputFormats.length > 0 &&
-    !inputFormats.includes(ALL_FORMAT) &&
-    inputFormats.every((format) => format !== ALL_FORMAT && supportsLossless(format))
-  );
+  // "Same as input": every matched input format must support lossless.
+  return inputFormats.length > 0 && inputFormats.every((format) => supportsLossless(format));
 }
 
 function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
@@ -137,7 +145,7 @@ function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
     console.log('formValue', formValue);
     mutations.updateAppOptions(
       {
-        ...omit(formValue, 'appTheme'),
+        ...omit(formValue, ['appTheme', 'confirmOnClose']),
         skipSaveMinRatio: toNumber(formValue.skipSaveMinRatio, DEFAULT_SKIP_SAVE_MIN_RATIO),
         newFileNameSuffix: formValue.newFileNameSuffix ?? '',
       },
@@ -236,19 +244,18 @@ function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
                             control={form.control}
                             name={`globalDefaultOptions.${index}.inputFormats`}
                             render={({ field }) => {
-                              const handleChangeInputFormats = (
-                                inputFormats: OptionInputFormat[],
-                              ) => {
-                                const prevIncludeAll = field.value.includes(ALL_FORMAT);
-                                const currExcludeAll = inputFormats.filter(
-                                  (item) => item !== ALL_FORMAT,
+                              const handleChangeInputFormats = (values: FormatSelectValue[]) => {
+                                const prevIncludeAll = field.value.length === 0;
+                                const currExcludeAll = values.filter(
+                                  (item): item is ImageFormat =>
+                                    item !== ALL_FORMAT && item !== SAME_FORMAT,
                                 );
-                                const nextInputFormats: OptionInputFormat[] =
+                                const nextInputFormats: ImageFormat[] =
                                   prevIncludeAll && currExcludeAll.length
                                     ? currExcludeAll
-                                    : inputFormats.includes(ALL_FORMAT)
-                                      ? [ALL_FORMAT]
-                                      : inputFormats;
+                                    : values.includes(ALL_FORMAT)
+                                      ? []
+                                      : currExcludeAll;
 
                                 field.onChange(nextInputFormats);
 
@@ -268,8 +275,8 @@ function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
                                     {i18n.text('input_formats')}
                                   </FormLabel>
                                   <FormControl>
-                                    <MultipleSelect<OptionInputFormat>
-                                      value={field.value}
+                                    <MultipleSelect<FormatSelectValue>
+                                      value={field.value.length === 0 ? [ALL_FORMAT] : field.value}
                                       options={([ALL_FORMAT, ...POPULAR_FORMATS] as const).map(
                                         (format) => ({
                                           value: format,
@@ -290,9 +297,10 @@ function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
                             control={form.control}
                             name={`globalDefaultOptions.${index}.outputFormat`}
                             render={({ field }) => {
-                              const handleChangeOutputFormat = (
-                                outputFormat: OptionOutputFormat,
-                              ) => {
+                              const handleChangeOutputFormat = (value: FormatSelectValue) => {
+                                const outputFormat: ImageFormat | null =
+                                  value === SAME_FORMAT ? null : (value as ImageFormat);
+
                                 field.onChange(outputFormat);
                                 if (!profileSupportsLossless(profile.inputFormats, outputFormat)) {
                                   form.setValue(
@@ -308,8 +316,8 @@ function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
                                     {i18n.text('output_format')}
                                   </FormLabel>
                                   <FormControl>
-                                    <Select<OptionOutputFormat>
-                                      value={field.value}
+                                    <Select<FormatSelectValue>
+                                      value={field.value ?? SAME_FORMAT}
                                       onChange={handleChangeOutputFormat}
                                       placeholder={i18n.text('output_format')}
                                       triggerClassName="w-50"
@@ -436,7 +444,7 @@ function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
                       onClick={() =>
                         append({
                           inputFormats: [],
-                          outputFormat: SAME_FORMAT,
+                          outputFormat: null,
                           options: {
                             quality: 75,
                           },
@@ -545,10 +553,21 @@ function AppOptionsView({ embedded = false }: { embedded?: boolean }) {
               {activeTab === 'general' && (
                 <>
                   {!embedded && (
-                    <FormItem>
-                      <FormLabel>{i18n.text('theme_color')}</FormLabel>
-                      <ThemeSelect />
-                    </FormItem>
+                    <>
+                      <FormItem>
+                        <FormLabel>{i18n.text('theme_color')}</FormLabel>
+                        <ThemeSelect />
+                      </FormItem>
+                      {RUNTIME !== 'web' && (
+                        <FormItem>
+                          <FormLabel>{i18n.text('confirm_on_close')}</FormLabel>
+                          <ConfirmOnCloseSwitch />
+                          <FormDescription>
+                            {i18n.text('confirm_on_close_description')}
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    </>
                   )}
                 </>
               )}

@@ -70,6 +70,8 @@
   "follow_system": "Систем",
   "conversion_settings": "Подешавања конверзије",
   "general": "генерал",
+  "confirm_on_close": "Потврди пре затварања",
+  "confirm_on_close_description": "Прикажи потврду при затварању ако ред није празан",
   "conversion_profiles": "Профили конверзије",
   "delete_conversion_profile": "Избришите профил конверзије",
   "format": "Формат",

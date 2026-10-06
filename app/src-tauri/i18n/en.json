@@ -70,6 +70,8 @@
   "follow_system": "System",
   "conversion_settings": "Conversion settings",
   "general": "General",
+  "confirm_on_close": "Confirm before closing",
+  "confirm_on_close_description": "Show a confirmation prompt when closing if the queue is not empty",
   "conversion_profiles": "Conversion profiles",
   "delete_conversion_profile": "Delete conversion profile",
   "format": "Format",

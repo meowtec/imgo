@@ -1,12 +1,6 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import type {
-  ImageObjectExt,
-  TaskCompletedResult,
-  TaskResult,
-  OptionInputFormat,
-  OptionOutputFormat,
-} from '@/types';
+import type { ImageObjectExt, TaskCompletedResult, TaskResult, FormatSelectValue } from '@/types';
 import { FILE_FORMAT_DISPLAY } from '@/constants/format';
 import { ALL_FORMAT, SAME_FORMAT } from '@/types';
 
@@ -67,7 +61,7 @@ export function isTaskResultComplete(
   return taskResult?.status === 'completed';
 }
 
-export function displayFormat(format: OptionInputFormat | OptionOutputFormat) {
+export function displayFormat(format: FormatSelectValue) {
   switch (format) {
     case SAME_FORMAT:
       return 'Same format';

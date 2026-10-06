@@ -8,8 +8,33 @@ import { invoke } from './workers';
 import { saveFileToLocal } from '@/lib/fs';
 import { getExtension } from '@imgo/shared-js';
 import type { ImageFormat } from '@imgo/shared-js';
+import type { AppOptions } from '@/types';
 
 export function listenEvents() {}
+
+const APP_OPTIONS_KEY = 'imgo:app-options';
+
+/**
+ * On the web the options are the single source of truth in localStorage.
+ */
+export function loadAppOptions(): Promise<Partial<AppOptions> | null> {
+  try {
+    const raw = localStorage.getItem(APP_OPTIONS_KEY);
+    return Promise.resolve(raw ? (JSON.parse(raw) as Partial<AppOptions>) : null);
+  } catch {
+    return Promise.resolve(null);
+  }
+}
+
+export function saveAppOptions(options: AppOptions): Promise<void> {
+  try {
+    localStorage.setItem(APP_OPTIONS_KEY, JSON.stringify(options));
+  } catch (err) {
+    console.error('Failed to save app options', err);
+  }
+
+  return Promise.resolve();
+}
 
 function normalizeDownloadFileName(name: string, format: ImageFormat) {
   const extension = getExtension(format);

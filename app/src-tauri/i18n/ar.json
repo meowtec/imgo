@@ -70,6 +70,8 @@
   "follow_system": "النظام",
   "conversion_settings": "إعدادات التحويل",
   "general": "عام",
+  "confirm_on_close": "تأكيد قبل الإغلاق",
+  "confirm_on_close_description": "إظهار رسالة تأكيد عند الإغلاق إذا كانت قائمة الانتظار غير فارغة",
   "conversion_profiles": "ملفات تعريف التحويل",
   "delete_conversion_profile": "حذف ملف تعريف التحويل",
   "format": "التنسيق",

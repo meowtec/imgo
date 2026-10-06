@@ -70,6 +70,8 @@
   "follow_system": "跟随系统",
   "conversion_settings": "转换设置",
   "general": "通用",
+  "confirm_on_close": "关闭时提醒",
+  "confirm_on_close_description": "关闭应用时，如果队列不为空则弹出确认",
   "conversion_profiles": "转换配置",
   "delete_conversion_profile": "删除转换配置",
   "format": "格式",

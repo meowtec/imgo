@@ -70,6 +70,8 @@
   "follow_system": "Système",
   "conversion_settings": "Paramètres de conversion",
   "general": "Général",
+  "confirm_on_close": "Confirmer avant de fermer",
+  "confirm_on_close_description": "Afficher une confirmation à la fermeture si la file d'attente n'est pas vide",
   "conversion_profiles": "Profils de conversion",
   "delete_conversion_profile": "Supprimer le profil de conversion",
   "format": "Format",

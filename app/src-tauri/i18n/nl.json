@@ -70,6 +70,8 @@
   "follow_system": "Systeem",
   "conversion_settings": "Conversie-instellingen",
   "general": "Algemeen",
+  "confirm_on_close": "Bevestigen voor sluiten",
+  "confirm_on_close_description": "Toon een bevestiging bij sluiten als de wachtrij niet leeg is",
   "conversion_profiles": "Conversieprofielen",
   "delete_conversion_profile": "Conversieprofiel verwijderen",
   "format": "Formaat",

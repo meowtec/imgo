@@ -70,6 +70,8 @@
   "follow_system": "Sistema",
   "conversion_settings": "Impostazioni di conversione",
   "general": "Generale",
+  "confirm_on_close": "Conferma prima di chiudere",
+  "confirm_on_close_description": "Mostra una conferma alla chiusura se la coda non è vuota",
   "conversion_profiles": "Profili di conversione",
   "delete_conversion_profile": "Elimina il profilo di conversione",
   "format": "Formato",

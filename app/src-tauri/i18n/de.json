@@ -70,6 +70,8 @@
   "follow_system": "System",
   "conversion_settings": "Konvertierungseinstellungen",
   "general": "Allgemein",
+  "confirm_on_close": "Vor dem Schließen bestätigen",
+  "confirm_on_close_description": "Beim Schließen eine Bestätigung anzeigen, wenn die Warteschlange nicht leer ist",
   "conversion_profiles": "Konvertierungsprofile",
   "delete_conversion_profile": "Conversion-Profil löschen",
   "format": "Format",

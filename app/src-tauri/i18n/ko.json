@@ -36,6 +36,8 @@
   "follow_system": "시스템",
   "format": "형식",
   "general": "일반",
+  "confirm_on_close": "닫기 전 확인",
+  "confirm_on_close_description": "대기열이 비어 있지 않으면 닫을 때 확인을 표시합니다",
   "height": "높이",
   "help": "도움말",
   "high_quality": "높은 품질",

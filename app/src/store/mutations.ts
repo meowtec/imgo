@@ -3,10 +3,8 @@ import { toast } from 'sonner';
 import type { ImageFormat, OptimizeOptions } from '@imgo/shared-js';
 import type { SaveFilesTriggerType } from '@/gen-types/SaveFilesTriggerType';
 import type { ImageObject } from '@/gen-types/ImageObject';
-import { clearFiles, saveFiles } from '@/platform';
+import { clearFiles, saveFiles, saveAppOptions } from '@/platform';
 import {
-  ALL_FORMAT,
-  SAME_FORMAT,
   type AppOptions,
   type ImageObjectExt,
   type ImageOptimizeOptions,
@@ -19,7 +17,7 @@ import { cachedOptimize } from '@/lib/services/optimize';
 import { ITEM_INNER_HEIGHT } from '@/constants/layout';
 import { i18n } from '@/lib/i18n';
 import { shouldSkipBatchSave } from '@/lib/should-skip-batch-save';
-import { idRelations, useStore } from './store';
+import { idRelations, useStore, withDefaultAppOptions } from './store';
 import { selectPendingTask } from './selectors';
 
 function getAllRelatedIds(id: string) {
@@ -39,7 +37,8 @@ function getDefaultOptions(
   appOptions: AppOptions,
 ): { outputFormat: ImageFormat; options: OptimizeOptions } {
   const defaultOptions = appOptions.globalDefaultOptions.find((item) => {
-    if (item.inputFormats.length === 0 || item.inputFormats.includes(ALL_FORMAT)) {
+    // An empty list means the profile applies to every input format.
+    if (item.inputFormats.length === 0) {
       return true;
     }
 
@@ -48,8 +47,7 @@ function getDefaultOptions(
 
   if (defaultOptions) {
     return {
-      outputFormat:
-        defaultOptions.outputFormat === SAME_FORMAT ? inputFormat : defaultOptions.outputFormat,
+      outputFormat: defaultOptions.outputFormat ?? inputFormat,
       options: defaultOptions.options,
     };
   }
@@ -171,6 +169,12 @@ export const mutations = {
     useStore.setState({ appOptionsVisible: visible });
   },
 
+  hydrateAppOptions(appOptions: Partial<AppOptions> | null | undefined) {
+    useStore.setState((state) => ({
+      appOptions: withDefaultAppOptions({ ...state.appOptions, ...appOptions }),
+    }));
+  },
+
   pickRunTask() {
     if (!taskCluster.available) {
       return;
@@ -285,6 +289,12 @@ export const mutations = {
             }))
           : state.tasks,
       };
+    });
+
+    // The platform adapter is the single source of truth: write through on every
+    // change. Persisting is fire-and-forget so the UI stays synchronous.
+    void saveAppOptions(useStore.getState().appOptions).catch((err) => {
+      console.error('Failed to persist app options', err);
     });
 
     mutations.batchPickRunTask(0);

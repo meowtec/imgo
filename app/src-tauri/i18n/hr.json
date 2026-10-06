@@ -70,6 +70,8 @@
   "follow_system": "sustav",
   "conversion_settings": "Postavke pretvorbe",
   "general": "generalno",
+  "confirm_on_close": "Potvrdi prije zatvaranja",
+  "confirm_on_close_description": "Prikaži potvrdu pri zatvaranju ako red nije prazan",
   "conversion_profiles": "Profili pretvorbe",
   "delete_conversion_profile": "Izbriši profil konverzije",
   "format": "Format",

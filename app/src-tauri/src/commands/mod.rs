@@ -1,5 +1,6 @@
 use std::{
   fmt::Display,
+  sync::Mutex,
   time::{self},
 };
 
@@ -11,6 +12,8 @@ use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_fs as tfs;
 
 use crate::{
+  app_options::AppOptions,
+  config::AppConfig,
   message::{FileAddCompleteMessage, FileAddProgressMessager, FileAddStartMessage},
   oss::{
     self, add_files_to_images, generate_file_name, read_file_data, walk_dir_add_images,
@@ -203,4 +206,18 @@ pub async fn save_files(
     save_type,
     new_file_name_suffix,
   );
+}
+
+#[tauri::command]
+pub fn get_app_options(state: State<Mutex<AppConfig>>) -> Option<AppOptions> {
+  state.lock().unwrap().options().cloned()
+}
+
+#[tauri::command]
+pub fn set_app_options(state: State<Mutex<AppConfig>>, options: AppOptions) -> Result<(), String> {
+  state
+    .lock()
+    .unwrap()
+    .set_options(options)
+    .map_err(err_to_string)
 }

@@ -3,6 +3,7 @@ import { listenEvents } from '@/platform';
 import App from './app';
 import { mutations } from './store';
 import { preCheckAllCompat } from './lib/image-utils';
+import { initAppOptions } from './lib/app-options';
 import { subscribeAppTheme } from './lib/theme';
 import { i18n } from './lib/i18n';
 import './index.css';
@@ -20,7 +21,7 @@ function ensureBootstrap(embedded: boolean) {
       subscribeAppTheme();
     }
 
-    bootstrapPromise = preCheckAllCompat().then(() => {
+    bootstrapPromise = Promise.all([preCheckAllCompat(), initAppOptions()]).then(() => {
       mutations.batchPickRunTask();
       listenEvents();
     });

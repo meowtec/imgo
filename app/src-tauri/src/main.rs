@@ -13,6 +13,7 @@ use std::{
 use commands::{
   emit_file_add, pick_files, pick_folders, save_files::SaveFilesTriggerType, start_emit_file_add,
 };
+use config::AppConfig;
 use i18n::I18n;
 use log::{debug, LevelFilter};
 use menu::{create_menu, menu_key};
@@ -20,7 +21,9 @@ use oss::{add_file_to_image, walk_dir_add_images};
 use tauri::{path::BaseDirectory, AppHandle, Emitter, Manager, Runtime, State, WindowEvent};
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 
+mod app_options;
 mod commands;
+mod config;
 mod i18n;
 mod menu;
 mod message;
@@ -32,6 +35,16 @@ mod utils;
 struct OpenedFilesState {
   frontend_ready: bool,
   pending: Vec<PathBuf>,
+}
+
+#[derive(Default)]
+struct CloseState {
+  has_tasks: bool,
+}
+
+#[tauri::command]
+fn set_has_tasks(state: State<Mutex<CloseState>>, has_tasks: bool) {
+  state.lock().unwrap().has_tasks = has_tasks;
 }
 
 fn paths_from_args<I, S>(args: I, cwd: &Path) -> Vec<PathBuf>
@@ -122,6 +135,8 @@ fn main() {
 
   let app = tauri::Builder::default()
     .manage(Mutex::new(OpenedFilesState::default()))
+    .manage(Mutex::new(CloseState::default()))
+    .manage(Mutex::new(AppConfig::default()))
     .plugin(tauri_plugin_single_instance::init(
       |app_handle, args, cwd| {
         let paths = paths_from_args(args, Path::new(&cwd));
@@ -146,6 +161,12 @@ fn main() {
     )
     .setup(move |app| {
       oss::setup(&app.path().resolve("oss", BaseDirectory::AppCache).unwrap());
+
+      let app_config_path = app
+        .path()
+        .resolve("options.json", BaseDirectory::AppConfig)
+        .unwrap();
+      *app.state::<Mutex<AppConfig>>().lock().unwrap() = AppConfig::load(app_config_path);
 
       debug!("args: {:?}", env::args());
       let cwd = env::current_dir().unwrap_or_default();
@@ -194,6 +215,23 @@ fn main() {
     })
     .on_window_event(move |window, event| match event {
       WindowEvent::CloseRequested { api, .. } => {
+        let should_confirm = window
+          .state::<Mutex<AppConfig>>()
+          .lock()
+          .unwrap()
+          .confirm_on_close()
+          && window
+            .state::<Mutex<CloseState>>()
+            .lock()
+            .unwrap()
+            .has_tasks;
+
+        if !should_confirm {
+          oss::clear_all();
+          window.destroy().expect("destroy main window");
+          return;
+        }
+
         api.prevent_close();
         let (title, message, confirm_text, cancel_text) = {
           let i18n = i18n_r.read().unwrap();
@@ -267,6 +305,9 @@ fn main() {
       commands::clear_all,
       commands::save_files,
       commands::clear_files,
+      commands::get_app_options,
+      commands::set_app_options,
+      set_has_tasks,
       frontend_ready,
     ])
     .build(tauri::generate_context!())

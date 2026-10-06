@@ -1,6 +1,6 @@
 import type { ImageObject } from '@/gen-types/ImageObject';
 import type { SaveFilesTriggerType } from '@/gen-types/SaveFilesTriggerType';
-import type { FileObject, ImageOptimizeResult } from '@/types';
+import type { AppOptions, FileObject, ImageOptimizeResult } from '@/types';
 import type { ImageFormat, OptimizeOptions } from '@imgo/shared-js';
 
 export interface ApiCalls {
@@ -37,6 +37,22 @@ export interface ApiCalls {
   clear_files: [
     {
       ids: string[];
+    },
+    void,
+  ];
+
+  get_app_options: [void, AppOptions | null];
+
+  set_app_options: [
+    {
+      options: AppOptions;
+    },
+    void,
+  ];
+
+  set_has_tasks: [
+    {
+      hasTasks: boolean;
     },
     void,
   ];
